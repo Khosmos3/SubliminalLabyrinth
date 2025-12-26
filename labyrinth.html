@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="height=device-height, initial-scale=1.0">
+    <title>Labyrinth</title>
+    <style>
+        @font-face {
+            font-family: Unifont;
+            src: url("Unifont.ttf");
+        }
+
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+            font-family: "Unifont";
+            user-select: none;
+        }
+
+        #container {
+            margin: auto;
+            display: flex;
+            width: fit-content;
+            margin-top: 10px;
+        }
+
+        #display {
+            padding: 10px;
+            height: 500px;
+            width: 500px;
+            text-align: left;
+            font-size: 20px;
+            border: 1px solid black;
+        }
+
+        #map {
+            text-align: center;
+            height: 500px;
+            width: 500px;
+            font-size: 16px;
+            line-height: 1em;
+        }
+
+        .clickable {
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="map"></div>
+        <div id="display"></div>
+    </div>
+</body>
+<script>
+    function get(id) {
+        return document.getElementById(id);
+    }
+
+    function set(text, id="display") {
+        get(id).innerHTML = text;
+    }
+
+    class Rand {
+        static random() {
+            return Math.random();
+        }
+
+        static intRange(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        static range(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        static choice(arr) {
+            return arr[this.intRange(0, arr.length - 1)];
+        }
+
+        // static bool(chance = .5) {
+        //     return this.random() < chance;
+        // }
+
+        static vector() {
+            return new Vector(Rand.range(-1, 1), Rand.range(-1, 1))
+        }
+    }
+
+    class Vector {
+        constructor(x, y){
+            this.x = x;
+            this.y = y;
+        }
+
+        equals(v) {
+            const EPS = 1e-6;
+            return Math.abs(this.x - v.x) < EPS && Math.abs(this.y - v.y) < EPS;
+        }
+
+        // +=, -=, *=, /=
+
+        add(v) {
+            this.x += v.x;
+            this.y += v.y;
+            return this;
+        }
+
+        sub(v) {
+            this.x -= v.x;
+            this.y -= v.y;
+            return this;
+        }
+
+        mul(s) {
+            this.x *= s;
+            this.y *= s;
+            return this;
+        }
+
+        div(s) {
+            return this.mul(1 / s);
+        }
+
+        // +, -, *, /
+
+        plus(v) {
+            return this.copy().add(v);
+        }
+
+        minus(v) {
+            return this.copy().sub(v);
+        }
+
+        times(s) {
+            return this.copy().mul(s);
+        }
+
+        over(s) {
+            return this.copy().div(s);
+        }
+    }
+
+    class Maze {
+        constructor(width, height) {
+            this.height = height;
+            this.width = width;
+            this.numRooms = this.height * this.width;
+            this.sizeCap = 100;
+            this.size = 0;
+            this.roomsAddable = ["hall", "fountain", "fountain", "fountain", "dead"];
+            this.rooms = [];
+            this.roomTiles = {
+                start: ["###", "###", "###"],
+                hall: ["▒ ▒", "   ", "▒ ▒"],
+                fountain: ["   ", " O ", "   "],
+                dead: ["▒░▒", "░░░", "▒░▒"],
+                empty: ["▓▓▓", "▓▓▓", "▓▓▓"]
+            }
+
+            this.posX;
+            this.posY;
+            this.currentRoom;
+            this.discoveredRooms = [];
+            
+            for (let i = 0; i < this.height; i++){
+                this.discoveredRooms.push([]);
+                for (let j = 0; j < this.width; j++)
+                    this.discoveredRooms[i].push(new Room(j, i));
+            }
+
+            for (let i = 0; i < this.height; i++){
+                this.rooms.push([]);
+                for (let j = 0; j < this.width; j++)
+                    this.rooms[i].push(new Room(j, i));
+            }
+        }
+
+        map(rooms = this.rooms) {
+            let s = "";
+
+            for (let i = 0; i < this.height; i++){
+
+                for (let round = 0; round < 4; round++) {
+                    for (let j = 0; j < this.width; j++) {
+                        let t = rooms[i][j].roomType;
+                        let c = rooms[i][j].connections;
+                        if (round == 0) {
+                            if (t == "empty")
+                                s += c.map(x => x[1]).indexOf(i - 1) != -1 ? "▓▓ ▓" : "▓▓▓▓";
+                            else s += c.map(x => x[1]).indexOf(i - 1) != -1 ? "▒▒ ▒" : "▒▒▒▒";
+                        } else {
+                            if (round == 2) s += (c.map(x => x[0]).indexOf(j - 1) != -1) ? " " : (t == "empty" ? "▓" : "▒");
+                            else s += t == "empty" ? "▓" : "▒";
+
+                            if (t == "start") s += this.roomTiles.start[round-1];
+                            else if (t == "empty") s += this.roomTiles.empty[round-1];
+                            else if (t == "hall") {
+                                // check connections!
+                                s += this.roomTiles.hall[round-1];
+                            }
+                            else if (t == "fountain") s += this.roomTiles.fountain[round-1];
+                            else if (t == "dead") s += this.roomTiles.dead[round-1];
+
+                            if (this.currentRoom == rooms[i][j] && round == 2)
+                                s = s.substring(0, s.length-2) + "<b>&</b>" + s.substring(s.length-1);
+
+                            //if (round == 2) s += c.map(x => x[0]).indexOf(j + 1) != -1 ? " " : "▓";
+                            //else s += "▓";
+                        }
+                    }
+                    s += "▓\n";
+                }                
+            }
+
+            for (let i = 0; i < this.width; i++)
+                s += "▓▓▓▓";
+
+            return s + "▓";
+        }
+
+        generate() {
+            let x = Rand.intRange(0, this.width - 1);
+            let y = Rand.intRange(0, this.height - 1);
+            this.rooms[y][x].roomType = "start";
+            this.posX = x;
+            this.posY = y;
+            this.currentRoom = this.rooms[y][x];
+
+            this.discoveredRooms[y][x] = this.currentRoom;
+
+            this.advance(x, y);
+
+            for (let i = 0; i < this.currentRoom.connections.length; i++) {
+                this.connectRooms(this.discoveredRooms[y][x],
+                                  this.discoveredRooms[this.currentRoom.connections[i][1]][this.currentRoom.connections[i][0]]);
+            }
+            set(this.map(this.discoveredRooms), "map")
+        }
+
+        display() {
+            let s = "";
+
+            for (let i = 0; i < this.height; i++){
+                for (let j = 0; j < this.width; j++) {
+                    let t = this.rooms[i][j].roomType;
+                    if (t == "start") s += "#";
+                    else if (t == "empty") s += "X";
+                    else if (t == "hall") s += "+";
+                    else if (t == "fountain") s += "O";
+                    else if (t == "dead") s += "=";
+                }
+                s += "\n";
+            }
+
+            console.log(s);
+        }
+
+        advance(x, y) {
+            let currentRoom = this.rooms[y][x];
+            let currentType = currentRoom.roomType;
+
+            currentRoom.new = false;
+
+            console.log(currentType)
+
+            if (currentType == "start") {
+                this.addRoom(x, y, 2);
+            } else if (currentType == "hall") {
+                this.addRoom(x, y);
+            } else if (currentType == "fountain") {
+                this.addRoom(x, y, 2);
+            } else if (currentType == "dead") {
+                // nothin'
+            } else {alert("mwop");}
+
+            this.getNeighbors(x, y).forEach(room => room.new ? this.advance(room.x, room.y) : "" );
+
+        }
+
+        addRoom(x, y, numRooms = 1) {
+            let valid;
+            let newRoom;
+            
+            for (let i = 0; i < numRooms; i++) {
+                valid = this.getNeighbors(x, y).filter(room => room.roomType == "empty");
+                if (valid.length == 0) return;
+
+                newRoom = Rand.choice(valid);
+                newRoom.roomType = Rand.choice(this.roomsAddable);
+                newRoom.new = true;
+                this.connectRooms(this.rooms[y][x], newRoom);
+            }
+        }
+
+        connectRooms(roomA, roomB) {
+            if (roomA.connections.map(x => x[0]+x[1]).indexOf(roomB.x+roomB.y) == -1)
+                roomA.connections.push([roomB.x, roomB.y]);
+            if (roomB.connections.map(x => x[0]+x[1]).indexOf(roomA.x+roomA.y) == -1)
+                roomB.connections.push([roomA.x, roomA.y]);
+        }
+
+        getNeighbors(x, y) {
+            let arr = [];
+
+            if (this.inBounds(x + 1, y)) arr.push(this.rooms[y][x + 1]);
+            if (this.inBounds(x - 1, y)) arr.push(this.rooms[y][x - 1]);
+            if (this.inBounds(x, y + 1)) arr.push(this.rooms[y + 1][x]);
+            if (this.inBounds(x, y - 1)) arr.push(this.rooms[y - 1][x]);
+
+            return arr;
+        }
+
+        inBounds(x, y) {
+            return x >= 0 && x < this.width && y >= 0 && y < this.height;
+        }
+
+        generateDirections() {
+            let r = [];
+
+            for (let i = 0; i < this.currentRoom.connections.length; i++) {
+                if (this.currentRoom.connections[i][0] == this.posX) {
+                    if (this.currentRoom.connections[i][1] == this.posY - 1) {
+                        r[0] = "You may go <span class='clickable' onclick='Labyrinth.move(\"north\")'>↟north↟</span><br>";
+                    } else {
+                        r[1] = "You may go <span class='clickable' onclick='Labyrinth.move(\"south\")'>↡south↡</span><br>";
+                    }
+                } else if (this.currentRoom.connections[i][1] == this.posY) {
+                    if (this.currentRoom.connections[i][0] == this.posX + 1) {
+                        r[2] = "You may go <span class='clickable' onclick='Labyrinth.move(\"east\")'>↠east↠</span><br>";
+                    } else {
+                        r[3] = "You may go <span class='clickable' onclick='Labyrinth.move(\"west\")'>↞west↞</span><br>";
+                    }
+                }
+            }
+
+            r = r.filter(Boolean)
+
+            return r.join("");
+        }
+
+        move(d) {
+            if (d == "north") this.posY--;
+            else if (d == "east") this.posX++;
+            else if (d == "south") this.posY++;
+            else if (d == "west") this.posX--;
+            
+            this.currentRoom = Labyrinth.rooms[this.posY][this.posX]
+
+            this.discoveredRooms[this.posY][this.posX] = this.currentRoom;
+
+            for (let i = 0; i < this.currentRoom.connections.length; i++) {
+                this.connectRooms(this.discoveredRooms[this.posY][this.posX],
+                                  this.discoveredRooms[this.currentRoom.connections[i][1]][this.currentRoom.connections[i][0]]);
+            }
+
+            set(this.map(this.discoveredRooms), "map")
+
+            set("You are at " + Labyrinth.currentRoom.roomType + "<br>" + Labyrinth.generateDirections())
+        }
+    }
+
+    class Room {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.roomType = "empty";
+            this.new = false;
+            this.connections = [];
+        }
+    }
+
+    let Labyrinth = new Maze(14, 8);
+    Labyrinth.generate();
+    Labyrinth.display();
+
+    set("You are at " + Labyrinth.currentRoom.roomType + "<br>" + Labyrinth.generateDirections())
+
+</script>
+</html>
