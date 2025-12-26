@@ -150,26 +150,27 @@
             this.numRooms = this.height * this.width;
             this.sizeCap = 100;
             this.size = 0;
-            this.roomsAddable = ["hall", "fountain", "fountain", "fountain", "dead"];
+            this.roomsAddable = ["hall", "fountain", "fountain", "loop", "dead"];
             this.rooms = [];
             this.roomTiles = {
                 start: ["###", "###", "###"],
                 hall: ["▒ ▒", "   ", "▒ ▒"],
                 fountain: ["   ", " O ", "   "],
                 dead: ["▒░▒", "░░░", "▒░▒"],
-                empty: ["▓▓▓", "▓▓▓", "▓▓▓"]
+                empty: ["▓▓▓", "▓▓▓", "▓▓▓"],
+                loop: [". .", "   ", ". ."]
             }
 
             this.posX;
             this.posY;
             this.currentRoom;
-            this.discoveredRooms = [];
+            //this.discoveredRooms = [];
             
-            for (let i = 0; i < this.height; i++){
-                this.discoveredRooms.push([]);
-                for (let j = 0; j < this.width; j++)
-                    this.discoveredRooms[i].push(new Room(j, i));
-            }
+            // for (let i = 0; i < this.height; i++){
+            //     this.discoveredRooms.push([]);
+            //     for (let j = 0; j < this.width; j++)
+            //         this.discoveredRooms[i].push(new Room(j, i));
+            // }
 
             for (let i = 0; i < this.height; i++){
                 this.rooms.push([]);
@@ -182,33 +183,42 @@
             let s = "";
 
             for (let i = 0; i < this.height; i++){
-
                 for (let round = 0; round < 4; round++) {
                     for (let j = 0; j < this.width; j++) {
                         let t = rooms[i][j].roomType;
                         let c = rooms[i][j].connections;
-                        if (round == 0) {
-                            if (t == "empty")
-                                s += c.map(x => x[1]).indexOf(i - 1) != -1 ? "▓▓ ▓" : "▓▓▓▓";
-                            else s += c.map(x => x[1]).indexOf(i - 1) != -1 ? "▒▒ ▒" : "▒▒▒▒";
-                        } else {
-                            if (round == 2) s += (c.map(x => x[0]).indexOf(j - 1) != -1) ? " " : (t == "empty" ? "▓" : "▒");
-                            else s += t == "empty" ? "▓" : "▒";
 
-                            if (t == "start") s += this.roomTiles.start[round-1];
-                            else if (t == "empty") s += this.roomTiles.empty[round-1];
-                            else if (t == "hall") {
+                        if (!rooms[i][j].discovered) {
+                            let visitedNeighbors = this.getNeighbors(j, i).filter(room => (room.discovered && room.connectsTo(j, i)));
+
+                            if (visitedNeighbors.map(room => room.y).indexOf(i - 1) !== -1 && round === 0)
+                                s += "▓▓ ▓";
+                            else if (visitedNeighbors.map(room => room.x).indexOf(j - 1) !== -1 && round === 2)
+                                s += " ▓▓▓";
+                            else s += "▓▓▓▓";
+                            
+                            continue;
+                        }
+
+                        if (round === 0) {
+                            s += c.map(room => room.y).indexOf(i - 1) !== -1 ? "▒▒ ▒" : "▒▒▒▒";
+                        } else {
+                            if (round === 2)
+                                s += (c.map(room => room.x).indexOf(j - 1) !== -1) ? " " : "▒";
+                            else s += "▒";
+
+                            if (t === "start") s += this.roomTiles.start[round-1];
+                            else if (t === "empty") s += this.roomTiles.empty[round-1];
+                            else if (t === "hall") {
                                 // check connections!
                                 s += this.roomTiles.hall[round-1];
                             }
-                            else if (t == "fountain") s += this.roomTiles.fountain[round-1];
-                            else if (t == "dead") s += this.roomTiles.dead[round-1];
+                            else if (t === "loop") s += this.roomTiles.loop[round-1]
+                            else if (t === "fountain") s += this.roomTiles.fountain[round-1];
+                            else if (t === "dead") s += this.roomTiles.dead[round-1];
 
                             if (this.currentRoom == rooms[i][j] && round == 2)
                                 s = s.substring(0, s.length-2) + "<b>&</b>" + s.substring(s.length-1);
-
-                            //if (round == 2) s += c.map(x => x[0]).indexOf(j + 1) != -1 ? " " : "▓";
-                            //else s += "▓";
                         }
                     }
                     s += "▓\n";
@@ -229,15 +239,23 @@
             this.posY = y;
             this.currentRoom = this.rooms[y][x];
 
-            this.discoveredRooms[y][x] = this.currentRoom;
+            this.currentRoom.discovered = true;
 
             this.advance(x, y);
 
-            for (let i = 0; i < this.currentRoom.connections.length; i++) {
-                this.connectRooms(this.discoveredRooms[y][x],
-                                  this.discoveredRooms[this.currentRoom.connections[i][1]][this.currentRoom.connections[i][0]]);
-            }
-            set(this.map(this.discoveredRooms), "map")
+            // how to position w only one rooms
+            // no silly stuff
+            // ok how to hide undiscovered
+            // room.discovered property sure whatever
+            // how to still show connections hm?
+            // if (!roomdiscovered) no graphics at onlanguagechange
+            // if (!roomdisocvet && connectedtocurrent) // sure can show some bs
+
+            // for (let i = 0; i < this.currentRoom.connections.length; i++) {
+            //     this.connectRooms(this.discoveredRooms[y][x],
+            //                       this.discoveredRooms[this.currentRoom.connections[i][1]][this.currentRoom.connections[i][0]]);
+            // }
+            set(this.map(), "map")
         }
 
         display() {
@@ -272,8 +290,12 @@
                 this.addRoom(x, y);
             } else if (currentType == "fountain") {
                 this.addRoom(x, y, 2);
+            } else if (currentType == "loop") {
+                let valid = this.getNeighbors(x, y).filter(room => room.roomType !== "empty");
+                for (let i = 0; i < valid.length; i++)
+                    this.connectRooms(currentRoom, valid[i]);
             } else if (currentType == "dead") {
-                // nothin'
+            
             } else {alert("mwop");}
 
             this.getNeighbors(x, y).forEach(room => room.new ? this.advance(room.x, room.y) : "" );
@@ -285,7 +307,7 @@
             let newRoom;
             
             for (let i = 0; i < numRooms; i++) {
-                valid = this.getNeighbors(x, y).filter(room => room.roomType == "empty");
+                valid = this.getNeighbors(x, y).filter(room => room.roomType === "empty");
                 if (valid.length == 0) return;
 
                 newRoom = Rand.choice(valid);
@@ -296,10 +318,10 @@
         }
 
         connectRooms(roomA, roomB) {
-            if (roomA.connections.map(x => x[0]+x[1]).indexOf(roomB.x+roomB.y) == -1)
-                roomA.connections.push([roomB.x, roomB.y]);
-            if (roomB.connections.map(x => x[0]+x[1]).indexOf(roomA.x+roomA.y) == -1)
-                roomB.connections.push([roomA.x, roomA.y]);
+            if (roomA.connections.map(room => room.x+"-"+room.y).indexOf(roomB.x+"-"+roomB.y) == -1)
+                roomA.connections.push(roomB);
+            if (roomB.connections.map(room => room.x+"-"+room.y).indexOf(roomA.x+"-"+roomA.y) == -1)
+                roomB.connections.push(roomA);
         }
 
         getNeighbors(x, y) {
@@ -319,16 +341,16 @@
 
         generateDirections() {
             let r = [];
-
+            
             for (let i = 0; i < this.currentRoom.connections.length; i++) {
-                if (this.currentRoom.connections[i][0] == this.posX) {
-                    if (this.currentRoom.connections[i][1] == this.posY - 1) {
+                if (this.currentRoom.connections[i].x == this.posX) {
+                    if (this.currentRoom.connections[i].y == this.posY - 1) {
                         r[0] = "You may go <span class='clickable' onclick='Labyrinth.move(\"north\")'>↟north↟</span><br>";
                     } else {
                         r[1] = "You may go <span class='clickable' onclick='Labyrinth.move(\"south\")'>↡south↡</span><br>";
                     }
-                } else if (this.currentRoom.connections[i][1] == this.posY) {
-                    if (this.currentRoom.connections[i][0] == this.posX + 1) {
+                } else if (this.currentRoom.connections[i].y == this.posY) {
+                    if (this.currentRoom.connections[i].x == this.posX + 1) {
                         r[2] = "You may go <span class='clickable' onclick='Labyrinth.move(\"east\")'>↠east↠</span><br>";
                     } else {
                         r[3] = "You may go <span class='clickable' onclick='Labyrinth.move(\"west\")'>↞west↞</span><br>";
@@ -347,18 +369,17 @@
             else if (d == "south") this.posY++;
             else if (d == "west") this.posX--;
             
-            this.currentRoom = Labyrinth.rooms[this.posY][this.posX]
+            this.currentRoom = this.rooms[this.posY][this.posX]
+            this.currentRoom.discovered = true;
 
-            this.discoveredRooms[this.posY][this.posX] = this.currentRoom;
+            // for (let i = 0; i < this.currentRoom.connections.length; i++) {
+            //     this.connectRooms(this.discoveredRooms[this.posY][this.posX],
+            //                       this.discoveredRooms[this.currentRoom.connections[i][1]][this.currentRoom.connections[i][0]]);
+            // }
 
-            for (let i = 0; i < this.currentRoom.connections.length; i++) {
-                this.connectRooms(this.discoveredRooms[this.posY][this.posX],
-                                  this.discoveredRooms[this.currentRoom.connections[i][1]][this.currentRoom.connections[i][0]]);
-            }
+            set(this.map(), "map")
 
-            set(this.map(this.discoveredRooms), "map")
-
-            set("You are at " + Labyrinth.currentRoom.roomType + "<br>" + Labyrinth.generateDirections())
+            set("You are at " + this.currentRoom.roomType + "<br>" + this.generateDirections())
         }
     }
 
@@ -369,6 +390,11 @@
             this.roomType = "empty";
             this.new = false;
             this.connections = [];
+            this.discovered = false;
+        }
+
+        connectsTo(x, y) {
+            return this.connections.map(room => room.x + "-" + room.y).indexOf(x + "-" + y) !== -1;
         }
     }
 
