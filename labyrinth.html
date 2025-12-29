@@ -436,9 +436,13 @@
         if (t > 1) t = 0;
         
         get("background").style.background = chainColorLerp([
-            ["#000000", 10],
-            ["#ffffff", 5]
-        ], 5, t);
+            ["#ff0000", 5],
+            ["#ffaa00", 5],
+            ["#ffff00", 5],
+            ["#00ff00", 5],
+            ["#0000ff", 5],
+            ["#ff00ff", 5]
+        ], t);
         console.log(chainColorLerp([
             ["#000000", 10],
             ["#ffffff", 5]
