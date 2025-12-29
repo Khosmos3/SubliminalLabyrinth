@@ -18,25 +18,28 @@
             user-select: none;
         }
 
+        #background {
+            border: 13px solid #203d83;
+            background: #c0f5f4;
+            width: 100vw;
+            height: 100vh;
+        }
+
         #container {
             margin: auto;
             display: flex;
             width: fit-content;
-            margin-top: 10px;
+            padding: 13px;
         }
 
         #display {
-            padding: 10px;
-            height: 500px;
-            width: 500px;
+            width: 300px;
             text-align: left;
             font-size: 20px;
-            border: 1px solid black;
         }
 
         #map {
             text-align: center;
-            height: 500px;
             width: 500px;
             font-size: 16px;
             line-height: 1em;
@@ -49,9 +52,11 @@
     </style>
 </head>
 <body>
-    <div id="container">
-        <div id="map"></div>
-        <div id="display"></div>
+    <div id="background">
+        <div id="container">
+            <div id="map"></div>
+            <div id="display"></div>
+        </div>
     </div>
 </body>
 <script>
@@ -143,6 +148,45 @@
         }
     }
 
+    function lerp(a1, a2, t) {
+        return a1 + t * (a2 - a1);
+    }
+
+    function colorLerp(c1, c2, t) {
+        let r1 = Number("0x"+c1.substring(1, 3));
+        let g1 = Number("0x"+c1.substring(3, 5));
+        let b1 = Number("0x"+c1.substring(5, 7));
+        let r2 = Number("0x"+c2.substring(1, 3));
+        let g2 = Number("0x"+c2.substring(3, 5));
+        let b2 = Number("0x"+c2.substring(5, 7));
+
+        let r3 = Math.round(lerp(r1, r2, t));
+        let g3 = Math.round(lerp(g1, g2, t));
+        let b3 = Math.round(lerp(b1, b2, t));
+
+        return "#" + r3.toString(16).padStart(2, "0") + g3.toString(16).padStart(2, "0") + b3.toString(16).padStart(2, "0");
+    }
+
+    function chainColorLerp(colors, scaling, t) {
+        let total = 0;
+        for (let i = 0; i < colors.length; i++)
+            total += colors[i][1];
+        total *= scaling;
+
+        let T = total * t;
+        let m = 0;
+
+        for (let i = 0; i < colors.length; i++) {
+            for (let j = 0; j < colors[i][1] * scaling; j++) {
+                if (T >= m && T < m + 1)
+                    return colorLerp(colors[i][0], colors[i+1 < colors.length ? i+1 : 0][0], j / (colors[i][1]*scaling));
+
+                m++
+            }
+        }
+
+    }
+
     class Maze {
         constructor(width, height) {
             this.height = height;
@@ -231,30 +275,15 @@
             return s + "▓";
         }
 
-        generate() {
-            let x = Rand.intRange(0, this.width - 1);
-            let y = Rand.intRange(0, this.height - 1);
+        generate(x = Rand.intRange(0, this.width - 1), y = Rand.intRange(0, this.height - 1)) {
             this.rooms[y][x].roomType = "start";
             this.posX = x;
             this.posY = y;
             this.currentRoom = this.rooms[y][x];
-
             this.currentRoom.discovered = true;
 
             this.advance(x, y);
 
-            // how to position w only one rooms
-            // no silly stuff
-            // ok how to hide undiscovered
-            // room.discovered property sure whatever
-            // how to still show connections hm?
-            // if (!roomdiscovered) no graphics at onlanguagechange
-            // if (!roomdisocvet && connectedtocurrent) // sure can show some bs
-
-            // for (let i = 0; i < this.currentRoom.connections.length; i++) {
-            //     this.connectRooms(this.discoveredRooms[y][x],
-            //                       this.discoveredRooms[this.currentRoom.connections[i][1]][this.currentRoom.connections[i][0]]);
-            // }
             set(this.map(), "map")
         }
 
@@ -281,8 +310,6 @@
             let currentType = currentRoom.roomType;
 
             currentRoom.new = false;
-
-            console.log(currentType)
 
             if (currentType == "start") {
                 this.addRoom(x, y, 2);
@@ -399,10 +426,28 @@
     }
 
     let Labyrinth = new Maze(14, 8);
-    Labyrinth.generate();
+    Labyrinth.generate(0, 3);
     Labyrinth.display();
 
     set("You are at " + Labyrinth.currentRoom.roomType + "<br>" + Labyrinth.generateDirections())
 
+    let t = 0;
+
+    setInterval(() => {
+        if (t > 1) t = 0;
+        
+        get("background").style.background = chainColorLerp([
+            ["#000000", 10],
+            ["#ffffff", 5]
+        ], 5, t);
+        console.log(chainColorLerp([
+            ["#000000", 10],
+            ["#ffffff", 5]
+        ], 5, t));
+        //get("background").style.background = colorLerp("#fa2d8d", "#b0091c", t);
+        t += 0.01;
+    }, 16);
+
+    // #5d629c to #eea44c to #fc7b1e to #fa2d8d to #b0091c to #2d0a4f to #060426
 </script>
 </html>
