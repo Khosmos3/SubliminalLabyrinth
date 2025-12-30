@@ -259,12 +259,17 @@
             this.roomsAddable = ["hall", "fountain", "bloom", "unkempt", "arch", "urn", "tree", "loop", "dead"];
             this.rooms = [];
             this.roomTiles = {
-                start: ["###", "###", "###"],
-                hall: ["▒ ▒", "   ", "▒ ▒"],
-                fountain: ["   ", " O ", "   "],
+                start: ["###", "#▩#", "###"],
+                hall: ["▒.▒", "  ,", "▒ ▒"],
+                fountain: [" . ", "'O ", "  ,"],
                 dead: ["▒░▒", "░░░", "▒░▒"],
                 empty: ["▓▓▓", "▓▓▓", "▓▓▓"],
-                loop: [". .", "   ", ". ."]
+                loop: ["., ", "  .", "= ."],
+                bloom: ["❀ ", ",  ", " ✾"],
+                unkempt: ["▒X▒", "\\/.", "▒=▒"],
+                arch: ["█∩█", "∩ ∩", "█∩█"],
+                urn: [", .", " ⬮ ", " \","],
+                tree: [",  ", " ⇞ ", "\"' "],
             }
 
             this.posX;
@@ -379,21 +384,28 @@
 
             currentRoom.new = false;
 
-            if (currentType == "start") {
-                this.addRoom(x, y, 2);
-            } else if (currentType == "hall" || currentType == "bloom" || currentType == "unkempt") {
+            if (currentType === "start") {
+                this.addRoom(x, y, 3);
+            } else if (currentType === "hall" || currentType === "unkempt") {
                 this.addRoom(x, y);
-            } else if (currentType == "fountain" || currentType == "tree") {
+            } else if (currentType === "tree" || currentType === "bloom") {
                 this.addRoom(x, y, 2);
-            } else if (currentType == "urn") {
+            } else if (currentType === "urn") {
                 if (Rand.chance(0.5)) this.addRoom(x, y, 1);
-            } else if (currentType == "loop" || currentType == "arch") {
+            } else if (currentType === "fountain") {
+                this.addRoom(x, y, 3);
+            } else if (currentType === "loop") {
                 let valid = this.getNeighbors(x, y).filter(room => room.roomType !== "empty");
                 for (let i = 0; i < valid.length; i++)
                     this.connectRooms(currentRoom, valid[i]);
-            } else if (currentType == "dead") {
+            } else if (currentType === "arch") {
+                this.addRoom(x, y, 1);
+                let valid = this.getNeighbors(x, y).filter(room => room.roomType !== "empty");
+                for (let i = 0; i < valid.length; i++)
+                    this.connectRooms(currentRoom, valid[i]);
+            } else if (currentType === "dead") {
             
-            } else {alert("mwop");}
+            } else {alert(currentType);}
 
             this.getNeighbors(x, y).forEach(room => room.new ? this.advance(room.x, room.y) : "" );
 
