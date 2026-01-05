@@ -177,76 +177,140 @@
         return a1 + t * (a2 - a1);
     }
 
-    function colorLerp(c1, c2, t) {
-        let r1 = Number("0x"+c1.substring(1, 3));
-        let g1 = Number("0x"+c1.substring(3, 5));
-        let b1 = Number("0x"+c1.substring(5, 7));
-        let r2 = Number("0x"+c2.substring(1, 3));
-        let g2 = Number("0x"+c2.substring(3, 5));
-        let b2 = Number("0x"+c2.substring(5, 7));
-
-        let r3 = Math.round(lerp(r1, r2, t));
-        let g3 = Math.round(lerp(g1, g2, t));
-        let b3 = Math.round(lerp(b1, b2, t));
-
-        return "#" + r3.toString(16).padStart(2, "0") + g3.toString(16).padStart(2, "0") + b3.toString(16).padStart(2, "0");
-    }
-
-    function chainColorLerp(colors, t) {
-        let total = 0;
-        for (let i = 0; i < colors.length; i++)
-            total += colors[i][1];
-
-        let T = total * t;
-        let m = 0;
-
-        for (let i = 0; i < colors.length; i++) {
-            for (let j = 0; j < colors[i][1]; j++) {
-                if (T >= m && T < m + 1)
-                    return colorLerp(colors[i][0], colors[i+1 < colors.length ? i+1 : 0][0], j / (colors[i][1]));
-
-                m++
-            }
-        }
-
-    }
-
-    function invertColor(color) {
-        let r = Number("0x"+color.substring(1, 3));
-        let g = Number("0x"+color.substring(3, 5));
-        let b = Number("0x"+color.substring(5, 7));
-
-        let ri = 255 - r;
-        let gi = 255 - g;
-        let bi = 255 - b;
-
-        return "#" + ri.toString(16).padStart(2, "0") + gi.toString(16).padStart(2, "0") + bi.toString(16).padStart(2, "0");
-    }
-
-    function greyscale(color) {
-        let r = Number("0x"+color.substring(1, 3));
-        let g = Number("0x"+color.substring(3, 5));
-        let b = Number("0x"+color.substring(5, 7));
-
-        let average = (r + b + g) / 3;
-
-        return "#" + average.toString(16).padStart(2, "0") + average.toString(16).padStart(2, "0") + average.toString(16).padStart(2, "0");
-    }
-
     function clamp(n, min, max) {
         return Math.max(Math.min(n, max), min);
     }
 
-    function shade(color, amount) {
-        let r = Number("0x"+color.substring(1, 3));
-        let g = Number("0x"+color.substring(3, 5));
-        let b = Number("0x"+color.substring(5, 7));
+    class Color {
+        constructor(c = false) {
+            if (c === false)
+                [this.r, this.g, this.b] = Color.hexToRGB("#ffffff");
+            else if (typeof c === "object")
+                [this.r, this.g, this.b] = c;
+            else if (typeof c === "string")
+                [this.r, this.g, this.b] = Color.hexToRGB(c);
+        }
 
-        let rs = clamp(r + amount, 0, 255);
-        let gs = clamp(r + amount, 0, 255);
-        let bs = clamp(r + amount, 0, 255);
+        getHex() {
+            return Color.RGBToHex(this.r, this.g, this.b);
+        }
 
-        return "#" + rs.toString(16).padStart(2, "0") + gs.toString(16).padStart(2, "0") + bs.toString(16).padStart(2, "0");
+        static hexToRGB(hex) {
+            return [Number("0x"+hex.substring(1, 3)), Number("0x"+hex.substring(3, 5)), Number("0x"+hex.substring(5, 7))];
+        }
+
+        static RGBToHex(r, g, b) {
+            return "#" + r.toString(16).padStart(2, "0") + g.toString(16).padStart(2, "0") + b.toString(16).padStart(2, "0");
+        }
+
+        colorLerp(c, t) {
+            if (typeof c !== "Color") c = new Color(c);
+
+            let out = new Color();
+
+            out.r = Math.round(lerp(this.r, c.r, t));
+            out.g = Math.round(lerp(this.g, c.g, t));
+            out.b = Math.round(lerp(this.b, c.b, t));
+
+            return out;
+        }
+
+        static colorLerp(c1, c2, t) {
+            if (typeof c1 !== "Color") c1 = new Color(c1);
+            if (typeof c2 !== "Color") c2 = new Color(c2);
+
+            let out = new Color();
+
+            out.r = Math.round(lerp(c1.r, c2.r, t));
+            out.g = Math.round(lerp(c1.g, c2.g, t));
+            out.b = Math.round(lerp(c1.b, c2.b, t));
+
+            return out;
+        }
+
+        static chainColorLerp(colors, t) {
+            let total = 0;
+            for (let i = 0; i < colors.length; i++)
+                total += colors[i][1];
+
+            let T = total * t;
+            let m = 0;
+
+            for (let i = 0; i < colors.length; i++) {
+                for (let j = 0; j < colors[i][1]; j++) {
+                    if (T >= m && T < m + 1)
+                        return this.colorLerp(colors[i][0], colors[i+1 < colors.length ? i+1 : 0][0], j / (colors[i][1]));
+
+                    m++
+                }
+            }
+        }
+
+        invert() {
+            this.r = 255 - this.r;
+            this.g = 255 - this.g;
+            this.b = 255 - this.b;
+        }
+
+        inverse() {
+            return new Color(255-this.r, 255-this.g, 255-this.b);
+        }
+
+        static invert(color) {
+            if (typeof color !== "Color") color = new Color(color);
+
+            return new Color(255-color.r, 255-color.g, 255-color.b);
+        }
+
+        greyscale() {
+            let average = (this.r + this.b + this.g) / 3;
+
+            this.r = average;
+            this.b = average;
+            this.g = average;
+        }
+
+        asGreyscale() {
+            let average = (this.r + this.b + this.g) / 3;
+
+            return new Color(average, average, average);
+        }
+
+        static greyscale(color) {
+            if (typeof color !== "Color") color = new Color(color);
+
+            let average = (color.r + color.b + color.g) / 3;
+
+            return new Color(average, average, average);
+        }
+
+        shade(amount) {
+            this.r = clamp(this.r + amount, 0, 255);
+            this.g = clamp(this.g + amount, 0, 255);
+            this.b = clamp(this.b + amount, 0, 255);
+        }
+
+        shaded(amount) {
+            let out = new Color(); 
+
+            out.r = clamp(this.r + amount, 0, 255);
+            out.g = clamp(this.g + amount, 0, 255);
+            out.b = clamp(this.b + amount, 0, 255);
+
+            return out;
+        }
+
+        static shade(color, amount) {
+            if (typeof color !== "Color") color = new Color(color);
+
+            let out = new Color(); 
+
+            out.r = clamp(color.r + amount, 0, 255);
+            out.g = clamp(color.g + amount, 0, 255);
+            out.b = clamp(color.b + amount, 0, 255);
+
+            return out;
+        }
     }
 
     class Maze {
@@ -616,7 +680,7 @@
                 break;
             }
 
-            if (Rand.random() > 0.7) {
+            if (Rand.random() > 0.5) {
                 log += " ";
 
                 if (t > 0.85 && t <= 0.97) {
@@ -723,7 +787,7 @@
             this.roomType = "empty";
             this.new = false;
             this.connections = [];
-            this.discovered = true;
+            this.discovered = false;
             this.timesVisited = 0;
         }
 
@@ -747,7 +811,7 @@
 
         setInterval(() => {
             if (t > 1) t = 0;
-            let color = chainColorLerp([
+            let color = Color.chainColorLerp([
                 ["#b4c8ce", 7000],
                 ["#dbedf3", 10000],
                 ["#afe6f6", 12000],
@@ -763,9 +827,9 @@
                 ["#040215", 10000],
             ], t);
 
-            get("background").style.background = color;
-            get("container").style.color = shade(greyscale(invertColor(color)), -70);
-            get("background").style.border = "13px solid " + shade(color, -50);
+            get("background").style.background = color.getHex();
+            get("container").style.color = color.inverse().asGreyscale().shaded(-70).getHex();
+            get("background").style.border = "13px solid " + color.shaded(-50).getHex();
 
             // ["#ff5555", 500], rainbow
             // ["#ffaa00", 500],
@@ -774,7 +838,7 @@
             // ["#5555ff", 500],
             // ["#ff00ff", 500]
 
-            t += 0.0001;
+            t += 0.00005;
         }, 16);
     }
 
