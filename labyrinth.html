@@ -514,9 +514,9 @@
             return x >= 0 && x < this.width && y >= 0 && y < this.height;
         }
 
-        generateDirections() {
+        generateDirections(ret = false) {
             let r = [];
-            
+
             for (let i = 0; i < this.currentRoom.connections.length; i++) {
                 if (this.currentRoom.connections[i].x == this.posX) {
                     if (this.currentRoom.connections[i].y == this.posY - 1) {
@@ -535,7 +535,7 @@
 
             r = r.filter(Boolean)
 
-            return r.join("");
+            return (ret ? this.clickable("Return<br>", "Labyrinth.updateLog({displayNewness: false})") : "") + r.join("");
         }
 
         move(d) {
@@ -599,48 +599,50 @@
 
             }
 
-            set(log + "<br><br>" + Labyrinth.generateDirections());
+            set(log + "<br><br>" + Labyrinth.generateDirections(true));
         }
 
-        updateLog(first = false) {
+        updateLog(details = {}) {
             let log = "";
 
-            if (first) {
+            if (details.first ?? false) {
                 set("You enter the labyrinth. The sun is rising slowly, filling the air with a misty glow." +
                     "The gravel pathways meander before you. Dark green hedges rise up around you, sturdy and immense." +
                     "They do not remind you of " + this.clickable("home") + ".<br><br>" + this.generateDirections());
                 return;
             }
 
-            if (this.currentRoom.timesVisited === 1) {
-                log += Rand.choice([
-                    "This place is new.",
-                    "You delve deeper into the labyrinth.",
-                    "You find yourself in an unfamiliar area.",
-                    "You push farther into the labyrinth.",
-                ]);
-            } else if (this.currentRoom.timesVisited >= 2 && this.currentRoom.timesVisited <= 4) {
-                log += Rand.choice([
-                    "You've been here before.",
-                    "This place is familiar.",
-                    "You double-back.",
-                ]);
-            } else if (this.currentRoom.timesVisited > 4 && this.currentRoom.timesVisited <= 7) {
-                log += Rand.choice([
-                    "You've been here many times.",
-                    "This part of the labyrinth is very familiar.",
-                    "You reenter this place yet again.",
-                ]);
-            } else if (this.currentRoom.timesVisited > 7) {
-                log += Rand.choice([
-                    "This part of the labyrinth is very familiar.",
-                    "You've been here many times.",
-                    "You seem to be travelling in circles.",
-                    "The hedges all begin to look the same.",
-                ]);
-            }
+            if (details.displayNewness ?? true) {
+                if (this.currentRoom.timesVisited === 1) {
+                    log += Rand.choice([
+                        "This place is new.",
+                        "You delve deeper into the labyrinth.",
+                        "You find yourself in an unfamiliar area.",
+                        "You push farther into the labyrinth.",
+                    ]);
+                } else if (this.currentRoom.timesVisited >= 2 && this.currentRoom.timesVisited <= 4) {
+                    log += Rand.choice([
+                        "You've been here before.",
+                        "This place is familiar.",
+                        "You double-back.",
+                    ]);
+                } else if (this.currentRoom.timesVisited > 4 && this.currentRoom.timesVisited <= 7) {
+                    log += Rand.choice([
+                        "You've been here many times.",
+                        "This part of the labyrinth is very familiar.",
+                        "You reenter this place yet again.",
+                    ]);
+                } else if (this.currentRoom.timesVisited > 7) {
+                    log += Rand.choice([
+                        "This part of the labyrinth is very familiar.",
+                        "You've been here many times.",
+                        "You seem to be travelling in circles.",
+                        "The hedges all begin to look the same.",
+                    ]);
+                }
 
-            log += "<br><br>";
+                log += "<br><br>";
+            }
 
             switch (this.currentRoom.roomType) {
                 case "start": log += Rand.choice([
@@ -820,7 +822,6 @@
                 ]);
                 break;
             }
-            console.log(t);
             log += "<br>";
 
             set(log + this.generateDirections());
@@ -853,7 +854,7 @@
         get("start-menu").style.display = "none";
         get("container").style.display = "flex";
 
-        Labyrinth.updateLog(true);
+        Labyrinth.updateLog({first: true});
 
         setInterval(() => {
             if (t > 1) t = 0;
