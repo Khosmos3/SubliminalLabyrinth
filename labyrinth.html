@@ -582,21 +582,35 @@
                 log += "You pause for a second, letting still air caress your ear. No vibrations echo through you. It really is silent. " + 
                 "The air itself feels like it could extinguish any word you'd say.";
             } else if (text === "hesitence") {
-
+                this.reminders.hesitence = true;
+                log += "You hesitate. There's something pure about such an action, something untainted. There's a oneness, a zenness, a suchness. " + 
+                "You hesitate. In hesitence, there is the bare admission of hesitence, of letting the mind calculate and of being able to do nothing but. " + 
+                "You hesitate. You are reminded of " + (this.reminders.other ? "someone else" : this.clickable("something else")) + ".";
             } else if (text === "hallways") {
-                
-            } else if (text === "secrets") {
-                
+                this.reminders.hallways = true;
+                log += "";
+            } else if (text === "keeping secrets") {
+                this.reminders.secrets = true;
+                log += "";
             } else if (text === "sand") {
-
+                this.reminders.sand = true;
+                log += "";
             } else if (text === "flour") {
-                
-            } else if (text === "breath") {
-                
+                this.reminders.flour = true;
+                log += "";
+            } else if (text === "breathing") {
+                this.reminders.breathing = true;
+                log += "";
             } else if (text === "love") {
-
+                this.reminders.love = true;
+                log += "You can be reminded of love because you knew love. When? Across all of space, somewhere, everywhere, through the borders of the universe and the constraints of light, you had felt love. " + 
+                "Who? All souls, together, as one. All souls, <i>not one, not-two</i>. A soul, someone, sigular. Different from you, not different from you. Love. " +
+                "<br><br>You can't really remember.";
             } else if (text === "hands") {
-
+                this.reminders.hands = true;
+                log += "";
+            } else if (text === "something else") {
+                this.reminders.other = true;
             }
 
             set(log + "<br><br>" + Labyrinth.generateDirections());
@@ -662,7 +676,7 @@
                 case "loop": log += Rand.choice([
                     "Hedges grow around you. Small, white flowers eke around their base.",
                     "Hedges grow around you. The gravel below you is a greyish-white.",
-                    "Hedges grow around you. Their deep green leaves remind you of " + (this.reminders.secrets ? "keeping secrets" : this.clickable("secrets")) + ".",
+                    "Hedges grow around you. Their deep green leaves remind you of " + (this.reminders.secrets ? "keeping secrets" : this.clickable("keeping secrets")) + ".",
                     "Hedges grow around you. They loom above you, unspeaking, unmoving.",
                 ]);
                 break;
@@ -698,7 +712,7 @@
                     "Crooked, bare branches poke between dark green leaves. Prickly shrubs cling around the base of the hedges.",
                     "Crooked, bare branches poke between dark green leaves. The hedges here are stuggling and dark green leaves scatter upon the ground.",
                     "Crooked, bare branches poke between dark green leaves. Even in this decrepitude, the hedges seem intent on containing you.",
-                    "Crooked, bare branches poke between dark green leaves. They remind you of " + (this.reminders.hands ? "hands" : this.clickable("hands")) + " and the various structures within them.",
+                    "Crooked, bare branches poke between dark green leaves. They remind you of " + (this.reminders.hands ? "your hands" : this.clickable("hands")) + " and the various structures within them.",
                 ]);
                 break;
                 case "arch": log += Rand.choice([
@@ -706,7 +720,7 @@
                     "Brick archways form a small arbor amidst the hedges. This small structure appears as a boat amidst the ocean of hedges.",
                     "Brick archways form a small arbor amidst the hedges. There are no hedges in this little respite.",
                     "Brick archways form a small arbor amidst the hedges. You can't help but wonder why this is here.",
-                    "Brick archways form a small arbor amidst the hedges. They remind you of " + (this.reminders.sand ? "sand" : this.clickable("sand")) + " and " + (this.reminders.flour ? "flour" : this.clickable("flour")) + ".",
+                    "Brick archways form a small arbor amidst the hedges. They remind you of " + (this.reminders.sand ? "time" : this.clickable("sand")) + " and " + (this.reminders.flour ? "flour" : this.clickable("flour")) + ".",
                 ]);
                 break;
                 case "urn": log += Rand.choice([
@@ -719,7 +733,7 @@
                 break;
                 case "dead": log += Rand.choice([
                     "Hedges encircle you. Small, prickly shrubs cling around their base.",
-                    "Hedges encircle you. Their deep green leaves remind you of " + (this.reminders.breathe ? "not breathing" : this.clickable("breath")) + ".",
+                    "Hedges encircle you. Their deep green leaves remind you of " + (this.reminders.breathing ? "not breathing" : this.clickable("breathing")) + ".",
                     "Hedges encircle you. The gravel is coarse and scattered.",
                     "Hedges encircle you. These thick forms seem intent on blotting out the sky.",
                     "Hedges encircle you. They seem to make the air darker.",
