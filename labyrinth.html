@@ -645,6 +645,22 @@
                 log += "You remember you are alive in the world. You remember that life is allowed to have meaning. You are reminded of meaning and of laughing and of having nothing to do. You almost remember somebody.";
             } else if (text === "them") {
                 log += "You don't know how you know, but they would never hurt you. They would let you be anything.";
+            } else if (text === "Pick a flower?") {
+                log += "You pick a flower! The stem connect it to the hedge gently breaks.<br>" + (this.self.wearingFlower ? "" : this.clickable("Put the flower in your hair?"));
+                this.self.hasFlower = true;
+            } else if (text === "Put the flower in your hair?") {
+                log += "You put the white flower gently into your hair. It stays and you smile.";
+                this.self.hasFlower = false;
+                this.self.wearingFlower = true;
+            } else if (text === "Put a flower atop the urn?") {
+                log += "You reach up and gently bestow the white flower on the urn's cover. It sits there and you observe how the white petals constant the dark metal. " + 
+                "You feel a whisper that isn't there echoing " + Rand.choice(["forgiveness", "relief", "kindness", "nothingness", "a sigh", "melancholy", "a sense of moving on"]) + ".";
+                this.self.hasFlower = false;
+                this.currentRoom.hasFlower = true;
+            } else if (text === "silly") {
+                this.reminders.silly = true;
+                log += "A smile dashes across your face. You feel light and floaty. When you look at things from far away, what matters? What gets distilled? " + 
+                "There is very little which truly matters in life and yet everything matters. The world is good, you are free, and there is nothing you cannot be."
             }
 
             this.self.understanding++;
@@ -733,9 +749,8 @@
                         "Blooming hedges surround you. Their white flowers remind you of " + (this.reminders.hesitence ? "hesitence" : this.clickable("hesitence")) + ".",
                         "Blooming hedges surround you. White flowers with yellow centers emerge from dark green leaves.",
                     ]);
-                    if (!this.self.hasFlower) {
-
-                    }
+                    if (!this.self.hasFlower)
+                        log += "<br>" + this.clickable("Pick a flower?");
                     break;
                 case "tree": log += Rand.choice([
                         "A single, thin tree sprouts from the gravel. Its grey branches hold tiny, green leaves.",
@@ -763,13 +778,24 @@
                         "Brick archways form a small arbor amidst the hedges. They remind you of " + (this.reminders.sand ? "time" : this.clickable("sand")) + " and " + (this.reminders.flour ? "flour" : this.clickable("flour")) + ".",
                     ]);
                     break;
-                case "urn": log += Rand.choice([
-                        "An urn sits on a small pedestal. It is made of iron and appears very heavy.",
-                        "An urn sits on a small pedestal. The hedges here around it are thick.",
-                        "An urn sits on a small pedestal. Wrought iron rings give it two handles.",
-                        "An urn sits on a small pedestal. It reminds you of " + (this.reminders.love ? "losing something you love" : this.clickable("love")) + ".",
-                        "An urn sits on a small pedestal. It reflects little light.",
-                    ]);
+                case "urn":
+                    if (this.currentRoom.hasFlower) log += Rand.choice([
+                            "A white flower sits atop an urn. The urn is made of iron and appears heavy.",
+                            "A white flower sits atop an urn. Its petals are light and pure.",
+                            "A white flower sits atop an urn. Wrought iron rings give the urn two handles.",
+                            "A white flower sits atop an urn. It reminds you of " + (this.reminders.silly ? "how silly things can be" : this.clickable("silly")) + ".",
+                            "A white flower sits atop an urn. The urn shimmers in any light that catches it.",
+                        ]);
+                    else log += Rand.choice([
+                            "An urn sits on a small pedestal. It is made of iron and appears very heavy.",
+                            "An urn sits on a small pedestal. The hedges here around it are thick.",
+                            "An urn sits on a small pedestal. Wrought iron rings give it two handles.",
+                            "An urn sits on a small pedestal. It reminds you of " + (this.reminders.love ? "losing something you love" : this.clickable("love")) + ".",
+                            "An urn sits on a small pedestal. It reflects little light.",
+                        ]);
+
+                    if (this.self.hasFlower && !this.currentRoom.hasFlower)
+                        log += "<br>" + this.clickable("Put a flower atop the urn?");
                     break;
                 case "dead": log += Rand.choice([
                         "Hedges encircle you. Small, prickly shrubs cling around their base.",
@@ -889,6 +915,7 @@
             this.connections = [];
             this.discovered = false;
             this.timesVisited = 0;
+            this.hasFlower = false;
         }
 
         connectsTo(x, y) {
