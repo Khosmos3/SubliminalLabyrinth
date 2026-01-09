@@ -269,17 +269,17 @@
         }
 
         inverse() {
-            return new Color(255-this.r, 255-this.g, 255-this.b);
+            return new Color([255-this.r, 255-this.g, 255-this.b]);
         }
 
         static invert(color) {
             if (typeof color !== "Color") color = new Color(color);
 
-            return new Color(255-color.r, 255-color.g, 255-color.b);
+            return new Color([255-color.r, 255-color.g, 255-color.b]);
         }
 
         greyscale() {
-            let average = (this.r + this.b + this.g) / 3;
+            let average = Math.round((this.r + this.b + this.g) / 3);
 
             this.r = average;
             this.b = average;
@@ -287,31 +287,31 @@
         }
 
         asGreyscale() {
-            let average = (this.r + this.b + this.g) / 3;
+            let average = Math.round((this.r + this.b + this.g) / 3);
 
-            return new Color(average, average, average);
+            return new Color([average, average, average]);
         }
 
         static greyscale(color) {
             if (typeof color !== "Color") color = new Color(color);
 
-            let average = (color.r + color.b + color.g) / 3;
+            let average = Math.round((color.r + color.b + color.g) / 3);
 
-            return new Color(average, average, average);
+            return new Color([average, average, average]);
         }
 
         shade(amount) {
-            this.r = clamp(this.r + amount, 0, 255);
-            this.g = clamp(this.g + amount, 0, 255);
-            this.b = clamp(this.b + amount, 0, 255);
+            this.r = Math.round(clamp(this.r + amount, 0, 255));
+            this.g = Math.round(clamp(this.g + amount, 0, 255));
+            this.b = Math.round(clamp(this.b + amount, 0, 255));
         }
 
         shaded(amount) {
             let out = new Color(); 
 
-            out.r = clamp(this.r + amount, 0, 255);
-            out.g = clamp(this.g + amount, 0, 255);
-            out.b = clamp(this.b + amount, 0, 255);
+            out.r = Math.round(clamp(this.r + amount, 0, 255));
+            out.g = Math.round(clamp(this.g + amount, 0, 255));
+            out.b = Math.round(clamp(this.b + amount, 0, 255));
 
             return out;
         }
@@ -321,9 +321,9 @@
 
             let out = new Color(); 
 
-            out.r = clamp(color.r + amount, 0, 255);
-            out.g = clamp(color.g + amount, 0, 255);
-            out.b = clamp(color.b + amount, 0, 255);
+            out.r = Math.round(clamp(color.r + amount, 0, 255));
+            out.g = Math.round(clamp(color.g + amount, 0, 255));
+            out.b = Math.round(clamp(color.b + amount, 0, 255));
 
             return out;
         }
@@ -364,7 +364,11 @@
             // }
 
             this.reminders = {};
-            this.understanding = 0;
+            this.self = {
+                understanding: 0,
+                hasFlower: false,
+                wearingFlower: false,
+            }
 
             for (let i = 0; i < this.height; i++){
                 this.rooms.push([]);
@@ -602,23 +606,29 @@
                 this.reminders.hesitence = true;
                 log += "You hesitate. There's something pure about such an action, something untainted. There's a oneness, a zenness, a suchness. " + 
                 "You hesitate. In hesitence, there is the bare admission of hesitence, of letting the mind calculate and of being able to do nothing but. " + 
-                "You hesitate. You are reminded of " + (this.reminders.other ? "someone else" : this.clickable("something else")) + ".";
+                "You hesitate. You are reminded of " + this.clickable("something else") + ".";
             } else if (text === "hallways") {
                 this.reminders.hallways = true;
                 log += "You remember another place, cold, sterile. You're unsure if this place is real or a fragment of a misfired neuron. Long, white halls stretch to the end of your vision. " + 
                 "The tiles on the floor bear intricate engravings and tesselations. You look deep into their opaque, reflective depths then shiver, shake your head, and return to the labyrinth.";
             } else if (text === "keeping secrets") {
                 this.reminders.secrets = true;
-                log += "";
+                log += "It seems like such a peculiar concept. Why would one conceal the truth? Why would one hide their actions? " + 
+                "And from who? You think.<br><br>There's only one person you can seem to recall and even they are fleeting. Still, you're inexplicably certain you would never hide anything from "
+                + this.clickable("them") + ". There would be no reason to.";
             } else if (text === "sand") {
                 this.reminders.sand = true;
-                log += "";
+                log += "How does something become sand? You ponder the gravel beneath your feet. Once, it may have been hulking, glacial boulders. Wind, <i>real</i> wind, could whittle it down. " + 
+                "The rain, the changing of temperatures. The sea. Being embraced by and beaten by the elements in turn. Enduring. And for what loss? To soften? To spread across the world, to become a deeper part of the one that is everything? " +
+                "There is no loss in being worn down by time here.";
             } else if (text === "flour") {
                 this.reminders.flour = true;
-                log += "";
+                log += "You narrow your memory, sifting particles of flour through the winnowing sieves of your mind. Bread. Warmth. Companionship. You are reminded of a certain richness "+ 
+                "before another cool and silent breeze shakes you from the reverie.";
             } else if (text === "breathing") {
                 this.reminders.breathing = true;
-                log += "";
+                log += "You remember to breathe. Your shoulders slack and your stomach loosens. You relax. You breathe in. You breathe out. You realize nothing is happening." +
+                "No air flows in, no air flows out. Goosebumps manifest across your flesh. You tighten. In this system of the observer and the environment, which is not real?";
             } else if (text === "love") {
                 this.reminders.love = true;
                 log += "You can be reminded of love because you knew love. When? Across all of space, somewhere, everywhere, through the borders of the universe and the constraints of light, you had felt love. " + 
@@ -626,12 +636,16 @@
                 "<br><br>You can't really remember.";
             } else if (text === "hands") {
                 this.reminders.hands = true;
-                log += "";
+                log += "You look down at your hands, then lift them directly before your eyes. You clench your fists, then splay your fingers as wide as they will go. " + 
+                "You fold each finger individually, watching how the shadows they cast dance and change. You look closer at the dark lines, crevasses, etches in your skin. " +
+                "You realize such small, beautiful details are rare here. How wonderful it is to occupy a body.";
             } else if (text === "something else") {
-                this.reminders.other = true;
+                log += "You remember you are alive in the world. You remember that life is allowed to have meaning. You are reminded of meaning and of laughing and of having nothing to do. You almost remember somebody.";
+            } else if (text === "them") {
+                log += "You don't know how you know, but they would never hurt you. They would let you be anything.";
             }
 
-            this.understanding++;
+            this.self.understanding++;
             set(log + "<br><br>" + Labyrinth.generateDirections(true));
         }
 
@@ -639,8 +653,8 @@
             let log = "";
 
             if (details.first ?? false) {
-                set("You enter the labyrinth. The sun is rising slowly, filling the air with a misty glow." +
-                    "The gravel pathways meander before you. Dark green hedges rise up around you, sturdy and immense." +
+                set("You enter the labyrinth. The sun is rising slowly, filling the air with a misty glow. " +
+                    "The gravel pathways meander before you. Dark green hedges rise up around you, sturdy and immense. " +
                     "They do not remind you of " + this.clickable("home") + ".<br><br>" + this.generateDirections());
                 return;
             }
@@ -918,7 +932,7 @@
             // ["#5555ff", 500],
             // ["#ff00ff", 500]
 
-            t += 0.00005;
+            t += 0.005;
         }, 16);
     }
 
