@@ -7,14 +7,28 @@
     <style>
         @font-face {
             font-family: Unifont;
-            src: url("Unifont.ttf");
+            src: url("Fonts/Unifont.ttf");
+        }
+
+        @font-face {
+            font-family: Instrument;
+            src: url("Fonts/Instrument_Serif/InstrumentSerif-Regular.ttf");
+        }
+
+        @font-face {
+            font-family: LindenHill;
+            src: url("Fonts/Linden_Hill/LindenHill-Regular.ttf");
+        }
+
+        @font-face {
+            font-family: GoudyBookletter;
+            src: url("Fonts/Goudy_Bookletter_1911/GoudyBookletter1911-Regular.ttf");
         }
 
         * {
             margin: 0px;
             padding: 0px;
             box-sizing: border-box;
-            font-family: "Unifont";
             user-select: none;
         }
 
@@ -50,9 +64,10 @@
         }
 
         #display {
-            width: 300px;
+            width: 400px;
             text-align: left;
-            font-size: 20px;
+            font-size: 18px;
+            font-family: "GoudyBookletter";     
         }
 
         #map {
@@ -60,6 +75,7 @@
             width: 500px;
             font-size: 16px;
             line-height: 1em;
+            font-family: "Unifont";
         }
 
         .clickable {
@@ -348,6 +364,7 @@
             // }
 
             this.reminders = {};
+            this.understanding = 0;
 
             for (let i = 0; i < this.height; i++){
                 this.rooms.push([]);
@@ -588,7 +605,8 @@
                 "You hesitate. You are reminded of " + (this.reminders.other ? "someone else" : this.clickable("something else")) + ".";
             } else if (text === "hallways") {
                 this.reminders.hallways = true;
-                log += "";
+                log += "You remember another place, cold, sterile. You're unsure if this place is real or a fragment of a misfired neuron. Long, white halls stretch to the end of your vision. " + 
+                "The tiles on the floor bear intricate engravings and tesselations. You look deep into their opaque, reflective depths then shiver, shake your head, and return to the labyrinth.";
             } else if (text === "keeping secrets") {
                 this.reminders.secrets = true;
                 log += "";
@@ -613,6 +631,7 @@
                 this.reminders.other = true;
             }
 
+            this.understanding++;
             set(log + "<br><br>" + Labyrinth.generateDirections(true));
         }
 
