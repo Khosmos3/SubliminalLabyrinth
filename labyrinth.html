@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="height=device-height, initial-scale=1.0">
@@ -54,7 +55,7 @@
             border: 1px solid black;
             cursor: pointer;
         }
-        
+
         #container {
             margin: auto;
             display: flex;
@@ -67,7 +68,7 @@
             width: 400px;
             text-align: left;
             font-size: 18px;
-            font-family: "GoudyBookletter";     
+            font-family: "GoudyBookletter";
         }
 
         #map {
@@ -84,6 +85,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="background">
         <div id="start-menu">
@@ -101,7 +103,7 @@
         return document.getElementById(id);
     }
 
-    function set(text, id="display") {
+    function set(text, id = "display") {
         get(id).innerHTML = text;
     }
 
@@ -136,7 +138,7 @@
     }
 
     class Vector {
-        constructor(x, y){
+        constructor(x, y) {
             this.x = x;
             this.y = y;
         }
@@ -212,7 +214,7 @@
         }
 
         static hexToRGB(hex) {
-            return [Number("0x"+hex.substring(1, 3)), Number("0x"+hex.substring(3, 5)), Number("0x"+hex.substring(5, 7))];
+            return [Number("0x" + hex.substring(1, 3)), Number("0x" + hex.substring(3, 5)), Number("0x" + hex.substring(5, 7))];
         }
 
         static RGBToHex(r, g, b) {
@@ -255,7 +257,7 @@
             for (let i = 0; i < colors.length; i++) {
                 for (let j = 0; j < colors[i][1]; j++) {
                     if (T >= m && T < m + 1)
-                        return this.colorLerp(colors[i][0], colors[i+1 < colors.length ? i+1 : 0][0], j / (colors[i][1]));
+                        return this.colorLerp(colors[i][0], colors[i + 1 < colors.length ? i + 1 : 0][0], j / (colors[i][1]));
 
                     m++
                 }
@@ -269,13 +271,13 @@
         }
 
         inverse() {
-            return new Color([255-this.r, 255-this.g, 255-this.b]);
+            return new Color([255 - this.r, 255 - this.g, 255 - this.b]);
         }
 
         static invert(color) {
             if (typeof color !== "Color") color = new Color(color);
 
-            return new Color([255-color.r, 255-color.g, 255-color.b]);
+            return new Color([255 - color.r, 255 - color.g, 255 - color.b]);
         }
 
         greyscale() {
@@ -307,7 +309,7 @@
         }
 
         shaded(amount) {
-            let out = new Color(); 
+            let out = new Color();
 
             out.r = Math.round(clamp(this.r + amount, 0, 255));
             out.g = Math.round(clamp(this.g + amount, 0, 255));
@@ -319,7 +321,7 @@
         static shade(color, amount) {
             if (typeof color !== "Color") color = new Color(color);
 
-            let out = new Color(); 
+            let out = new Color();
 
             out.r = Math.round(clamp(color.r + amount, 0, 255));
             out.g = Math.round(clamp(color.g + amount, 0, 255));
@@ -356,7 +358,7 @@
             this.posY;
             this.currentRoom;
             //this.discoveredRooms = [];
-            
+
             // for (let i = 0; i < this.height; i++){
             //     this.discoveredRooms.push([]);
             //     for (let j = 0; j < this.width; j++)
@@ -370,7 +372,7 @@
                 wearingFlower: false,
             }
 
-            for (let i = 0; i < this.height; i++){
+            for (let i = 0; i < this.height; i++) {
                 this.rooms.push([]);
                 for (let j = 0; j < this.width; j++)
                     this.rooms[i].push(new Room(j, i));
@@ -380,7 +382,7 @@
         map(rooms = this.rooms) {
             let s = "";
 
-            for (let i = 0; i < this.height; i++){
+            for (let i = 0; i < this.height; i++) {
                 for (let round = 0; round < 4; round++) {
                     for (let j = 0; j < this.width; j++) {
                         let t = rooms[i][j].roomType;
@@ -394,7 +396,7 @@
                             else if (visitedNeighbors.map(room => room.x).indexOf(j - 1) !== -1 && round === 2)
                                 s += " ▓▓▓";
                             else s += "▓▓▓▓";
-                            
+
                             continue;
                         }
 
@@ -405,27 +407,27 @@
                                 s += (c.map(room => room.x).indexOf(j - 1) !== -1) ? " " : "▒";
                             else s += "▒";
 
-                            if (t === "start") s += this.roomTiles.start[round-1];
-                            else if (t === "empty") s += this.roomTiles.empty[round-1];
+                            if (t === "start") s += this.roomTiles.start[round - 1];
+                            else if (t === "empty") s += this.roomTiles.empty[round - 1];
                             else if (t === "hall") {
                                 // check connections!
-                                s += this.roomTiles.hall[round-1];
+                                s += this.roomTiles.hall[round - 1];
                             }
-                            else if (t === "loop") s += this.roomTiles.loop[round-1]
-                            else if (t === "tree") s += this.roomTiles.tree[round-1];
-                            else if (t === "unkempt") s += this.roomTiles.unkempt[round-1];
-                            else if (t === "urn") s += this.roomTiles.urn[round-1];
-                            else if (t === "arch") s += this.roomTiles.arch[round-1];
-                            else if (t === "bloom") s += this.roomTiles.bloom[round-1];
-                            else if (t === "fountain") s += this.roomTiles.fountain[round-1];
-                            else if (t === "dead") s += this.roomTiles.dead[round-1];
+                            else if (t === "loop") s += this.roomTiles.loop[round - 1]
+                            else if (t === "tree") s += this.roomTiles.tree[round - 1];
+                            else if (t === "unkempt") s += this.roomTiles.unkempt[round - 1];
+                            else if (t === "urn") s += this.roomTiles.urn[round - 1];
+                            else if (t === "arch") s += this.roomTiles.arch[round - 1];
+                            else if (t === "bloom") s += this.roomTiles.bloom[round - 1];
+                            else if (t === "fountain") s += this.roomTiles.fountain[round - 1];
+                            else if (t === "dead") s += this.roomTiles.dead[round - 1];
 
                             if (this.currentRoom == rooms[i][j] && round == 2)
-                                s = s.substring(0, s.length-2) + "<b>&</b>" + s.substring(s.length-1);
+                                s = s.substring(0, s.length - 2) + "<b>&</b>" + s.substring(s.length - 1);
                         }
                     }
                     s += "▓\n";
-                }                
+                }
             }
 
             for (let i = 0; i < this.width; i++)
@@ -491,17 +493,17 @@
                 for (let i = 0; i < valid.length; i++)
                     this.connectRooms(currentRoom, valid[i]);
             } else if (currentType === "dead") {
-            
-            } else {alert(currentType);}
 
-            this.getNeighbors(x, y).forEach(room => room.new ? this.advance(room.x, room.y) : "" );
+            } else { alert(currentType); }
+
+            this.getNeighbors(x, y).forEach(room => room.new ? this.advance(room.x, room.y) : "");
 
         }
 
         addRoom(x, y, numRooms = 1) {
             let valid;
             let newRoom;
-            
+
             for (let i = 0; i < numRooms; i++) {
                 valid = this.getNeighbors(x, y).filter(room => room.roomType === "empty");
                 if (valid.length == 0) return;
@@ -514,9 +516,9 @@
         }
 
         connectRooms(roomA, roomB) {
-            if (roomA.connections.map(room => room.x+"-"+room.y).indexOf(roomB.x+"-"+roomB.y) == -1)
+            if (roomA.connections.map(room => room.x + "-" + room.y).indexOf(roomB.x + "-" + roomB.y) == -1)
                 roomA.connections.push(roomB);
-            if (roomB.connections.map(room => room.x+"-"+room.y).indexOf(roomA.x+"-"+roomA.y) == -1)
+            if (roomB.connections.map(room => room.x + "-" + room.y).indexOf(roomA.x + "-" + roomA.y) == -1)
                 roomB.connections.push(roomA);
         }
 
@@ -564,7 +566,7 @@
             else if (d == "east") this.posX++;
             else if (d == "south") this.posY++;
             else if (d == "west") this.posX--;
-            
+
             this.currentRoom = this.rooms[this.posY][this.posX]
             this.currentRoom.discovered = true;
             this.currentRoom.timesVisited++;
@@ -593,52 +595,52 @@
             } else if (text === "sleeping") {
                 this.reminders.sleeping = true;
                 log += "Being awake is like being asleep. You don't need to sleep, you are asleep, you are awake. It is <i>non-two</i>. " +
-                "Seeing with the eyes is like seeing with a dream. Neurons flash like rain making such eloquent reveries."
+                    "Seeing with the eyes is like seeing with a dream. Neurons flash like rain making such eloquent reveries."
             } else if (text === "depths") {
                 this.reminders.depths = true;
                 log += "You know, but cannot admit, this is where you are. The depths. Something about the fresh air and the sun and moon circling above feels " +
-                "so impossibly deep, sundered, sunken. You can breathe, you can't breathe. It is <i>non-two</i>."
+                    "so impossibly deep, sundered, sunken. You can breathe, you can't breathe. It is <i>non-two</i>."
             } else if (text === "silence") {
                 this.reminders.silence = true;
-                log += "You pause for a second, letting still air caress your ear. No vibrations echo through you. It really is silent. " + 
-                "The air itself feels like it could extinguish any word you'd say.";
+                log += "You pause for a second, letting still air caress your ear. No vibrations echo through you. It really is silent. " +
+                    "The air itself feels like it could extinguish any word you'd say.";
             } else if (text === "hesitence") {
                 this.reminders.hesitence = true;
-                log += "You hesitate. There's something pure about such an action, something untainted. There's a oneness, a zenness, a suchness. " + 
-                "You hesitate. In hesitence, there is the bare admission of hesitence, of letting the mind calculate and of being able to do nothing but. " + 
-                "You hesitate. You are reminded of " + this.clickable("something else") + ".";
+                log += "You hesitate. There's something pure about such an action, something untainted. There's a oneness, a zenness, a suchness. " +
+                    "You hesitate. In hesitence, there is the bare admission of hesitence, of letting the mind calculate and of being able to do nothing but. " +
+                    "You hesitate. You are reminded of " + this.clickable("something else") + ".";
             } else if (text === "hallways") {
                 this.reminders.hallways = true;
-                log += "You remember another place, cold, sterile. You're unsure if this place is real or a fragment of a misfired neuron. Long, white halls stretch to the end of your vision. " + 
-                "The tiles on the floor bear intricate engravings and tesselations. You look deep into their opaque, reflective depths then shiver, shake your head, and return to the labyrinth.";
+                log += "You remember another place, cold, sterile. You're unsure if this place is real or a fragment of a misfired neuron. Long, white halls stretch to the end of your vision. " +
+                    "The tiles on the floor bear intricate engravings and tesselations. You look deep into their opaque, reflective depths then shiver, shake your head, and return to the labyrinth.";
             } else if (text === "keeping secrets") {
                 this.reminders.secrets = true;
-                log += "It seems like such a peculiar concept. Why would one conceal the truth? Why would one hide their actions? " + 
-                "And from who? You think.<br><br>There's only one person you can seem to recall and even they are fleeting. Still, you're inexplicably certain you would never hide anything from "
-                + this.clickable("them") + ". There would be no reason to.";
+                log += "It seems like such a peculiar concept. Why would one conceal the truth? Why would one hide their actions? " +
+                    "And from who? You think.<br><br>There's only one person you can seem to recall and even they are fleeting. Still, you're inexplicably certain you would never hide anything from "
+                    + this.clickable("them") + ". There would be no reason to.";
             } else if (text === "sand") {
                 this.reminders.sand = true;
-                log += "How does something become sand? You ponder the gravel beneath your feet. Once, it may have been hulking, glacial boulders. Wind, <i>real</i> wind, could whittle it down. " + 
-                "The rain, the changing of temperatures. The sea. Being embraced by and beaten by the elements in turn. Enduring. And for what loss? To soften? To spread across the world, to become a deeper part of the one that is everything? " +
-                "There is no loss in being worn down by time here.";
+                log += "How does something become sand? You ponder the gravel beneath your feet. Once, it may have been hulking, glacial boulders. Wind, <i>real</i> wind, could whittle it down. " +
+                    "The rain, the changing of temperatures. The sea. Being embraced by and beaten by the elements in turn. Enduring. And for what loss? To soften? To spread across the world, to become a deeper part of the one that is everything? " +
+                    "There is no loss in being worn down by time here.";
             } else if (text === "flour") {
                 this.reminders.flour = true;
-                log += "You narrow your memory, sifting particles of flour through the winnowing sieves of your mind. Bread. Warmth. Companionship. You are reminded of a certain richness "+ 
-                "before another cool and silent breeze shakes you from the reverie.";
+                log += "You narrow your memory, sifting particles of flour through the winnowing sieves of your mind. Bread. Warmth. Companionship. You are reminded of a certain richness " +
+                    "before another cool and silent breeze shakes you from the reverie.";
             } else if (text === "breathing") {
                 this.reminders.breathing = true;
                 log += "You remember to breathe. Your shoulders slack and your stomach loosens. You relax. You breathe in. You breathe out. You realize nothing is happening." +
-                "No air flows in, no air flows out. Goosebumps manifest across your flesh. You tighten. In this system of the observer and the environment, which is not real?";
+                    "No air flows in, no air flows out. Goosebumps manifest across your flesh. You tighten. In this system of the observer and the environment, which is not real?";
             } else if (text === "love") {
                 this.reminders.love = true;
-                log += "You can be reminded of love because you knew love. When? Across all of space, somewhere, everywhere, through the borders of the universe and the constraints of light, you had felt love. " + 
-                "Who? All souls, together, as one. All souls, <i>not one, not-two</i>. A soul, someone, sigular. Different from you, not different from you. Love. " +
-                "<br><br>You can't really remember.";
+                log += "You can be reminded of love because you knew love. When? Across all of space, somewhere, everywhere, through the borders of the universe and the constraints of light, you had felt love. " +
+                    "Who? All souls, together, as one. All souls, <i>not one, not-two</i>. A soul, someone, sigular. Different from you, not different from you. Love. " +
+                    "<br><br>You can't really remember.";
             } else if (text === "hands") {
                 this.reminders.hands = true;
-                log += "You look down at your hands, then lift them directly before your eyes. You clench your fists, then splay your fingers as wide as they will go. " + 
-                "You fold each finger individually, watching how the shadows they cast dance and change. You look closer at the dark lines, crevasses, etches in your skin. " +
-                "You realize such small, beautiful details are rare here. How wonderful it is to occupy a body.";
+                log += "You look down at your hands, then lift them directly before your eyes. You clench your fists, then splay your fingers as wide as they will go. " +
+                    "You fold each finger individually, watching how the shadows they cast dance and change. You look closer at the dark lines, crevasses, etches in your skin. " +
+                    "You realize such small, beautiful details are rare here. How wonderful it is to occupy a body.";
             } else if (text === "something else") {
                 log += "You remember you are alive in the world. You remember that life is allowed to have meaning. You are reminded of meaning and of laughing and of having nothing to do. You almost remember somebody.";
             } else if (text === "them") {
@@ -693,87 +695,90 @@
 
             switch (this.currentRoom.roomType) {
                 case "start": log += Rand.choice([
-                    "The ground here is rough. Small, broken tiles cover it.",
-                    "The ground here is rough. This is where you began.",
-                    "The ground here is rough. The hedges are tall and deep green.",
-                    "The ground here is rough. Interspersed in the gravel underfoot are small tile fragments.",
-                ]);
-                break;
+                        "The ground here is rough. Small, broken tiles cover it.",
+                        "The ground here is rough. This is where you began.",
+                        "The ground here is rough. The hedges are tall and deep green.",
+                        "The ground here is rough. Interspersed in the gravel underfoot are small tile fragments.",
+                    ]);
+                    break;
                 case "hall": log += Rand.choice([
-                    "Hedges line your way. The ground underfoot is loose gravel. Small pieces within it seem to glitter.",
-                    "Hedges line your way. They tower above you towards the sky.",
-                    "Hedges line your way. Their deep green leaves remind you of " + (this.reminders.sleeping ? "sleeping" : this.clickable("sleeping")) + ".",
-                    "Hedges line your way. Their deep green leaves remind you of " + (this.reminders.depths ? "depths" : this.clickable("depths")) + ".",
-                    "Hedges line your way. Their deep green leaves remind you of " + (this.reminders.silence ? "silence" : this.clickable("silence")) + ".",
-                    "Hedges line your way. The air smells fresh and woody.",
-                ]);
-                break;
+                        "Hedges line your way. The ground underfoot is loose gravel. Small pieces within it seem to glitter.",
+                        "Hedges line your way. They tower above you towards the sky.",
+                        "Hedges line your way. Their deep green leaves remind you of " + (this.reminders.sleeping ? "sleeping" : this.clickable("sleeping")) + ".",
+                        "Hedges line your way. Their deep green leaves remind you of " + (this.reminders.depths ? "depths" : this.clickable("depths")) + ".",
+                        "Hedges line your way. Their deep green leaves remind you of " + (this.reminders.silence ? "silence" : this.clickable("silence")) + ".",
+                        "Hedges line your way. The air smells fresh and woody.",
+                    ]);
+                    break;
                 case "loop": log += Rand.choice([
-                    "Hedges grow around you. Small, white flowers eke around their base.",
-                    "Hedges grow around you. The gravel below you is a greyish-white.",
-                    "Hedges grow around you. Their deep green leaves remind you of " + (this.reminders.secrets ? "keeping secrets" : this.clickable("keeping secrets")) + ".",
-                    "Hedges grow around you. They loom above you, unspeaking, unmoving.",
-                ]);
-                break;
+                        "Hedges grow around you. Small, white flowers eke around their base.",
+                        "Hedges grow around you. The gravel below you is a greyish-white.",
+                        "Hedges grow around you. Their deep green leaves remind you of " + (this.reminders.secrets ? "keeping secrets" : this.clickable("keeping secrets")) + ".",
+                        "Hedges grow around you. They loom above you, unspeaking, unmoving.",
+                    ]);
+                    break;
                 case "fountain": log += Rand.choice([
-                    "A fountain quietly bubbles here. The water is cold and slightly brackish.",
-                    "A fountain quietly bubbles here. Moss clings to its stony rim.",
-                    "A fountain quietly bubbles here. Lichen speckles across it.",
-                    "A fountain quietly bubbles here. A few small patches of algae cover the surface of the water.",
-                    "A fountain quietly bubbles here. The stone which composes it is worn.",
-                    "A fountain quietly bubbles here. Small, dulled reliefs decorate its edges.",
-                    "A fountain quietly bubbles here. Its bowl is not deep. A few small stones rest at its bottom.",
-                ]);
-                break;
+                        "A fountain quietly bubbles here. The water is cold and slightly brackish.",
+                        "A fountain quietly bubbles here. Moss clings to its stony rim.",
+                        "A fountain quietly bubbles here. Lichen speckles across it.",
+                        "A fountain quietly bubbles here. A few small patches of algae cover the surface of the water.",
+                        "A fountain quietly bubbles here. The stone which composes it is worn.",
+                        "A fountain quietly bubbles here. Small, dulled reliefs decorate its edges.",
+                        "A fountain quietly bubbles here. Its bowl is not deep. A few small stones rest at its bottom.",
+                    ]);
+                    break;
                 case "bloom": log += Rand.choice([
-                    "Blooming hedges surround you. Their white flowers face you.",
-                    "Blooming hedges surround you. The flowers fill the air with a strong, sweet scent.",
-                    "Blooming hedges surround you. Their white flowers remind you of " + (this.reminders.hesitence ? "hesitence" : this.clickable("hesitence")) + ".",
-                    "Blooming hedges surround you. White flowers with yellow centers emerge from dark green leaves.",
-                ]);
-                break;
+                        "Blooming hedges surround you. Their white flowers face you.",
+                        "Blooming hedges surround you. The flowers fill the air with a strong, sweet scent.",
+                        "Blooming hedges surround you. Their white flowers remind you of " + (this.reminders.hesitence ? "hesitence" : this.clickable("hesitence")) + ".",
+                        "Blooming hedges surround you. White flowers with yellow centers emerge from dark green leaves.",
+                    ]);
+                    if (!this.self.hasFlower) {
+
+                    }
+                    break;
                 case "tree": log += Rand.choice([
-                    "A single, thin tree sprouts from the gravel. Its grey branches hold tiny, green leaves.",
-                    "A single, thin tree sprouts from the gravel. There is elegance in its slenderness.",
-                    "A single, thin tree sprouts from the gravel. It reminds you of long, marble " + (this.reminders.hallways ? "hallways" : this.clickable("hallways")) + ".",
-                    "A single, thin tree sprouts from the gravel. Its leaves, small as they are, flutter.",
-                    "A single, thin tree sprouts from the gravel. It grows proudly in the middle of the path.",
-                    "A single, thin tree sprouts from the gravel. It is still shorter than the hedges.",
-                ]);
-                break;
+                        "A single, thin tree sprouts from the gravel. Its grey branches hold tiny, green leaves.",
+                        "A single, thin tree sprouts from the gravel. There is elegance in its slenderness.",
+                        "A single, thin tree sprouts from the gravel. It reminds you of long, marble " + (this.reminders.hallways ? "hallways" : this.clickable("hallways")) + ".",
+                        "A single, thin tree sprouts from the gravel. Its leaves, small as they are, flutter.",
+                        "A single, thin tree sprouts from the gravel. It grows proudly in the middle of the path.",
+                        "A single, thin tree sprouts from the gravel. It is still shorter than the hedges.",
+                    ]);
+                    break;
                 case "unkempt": log += Rand.choice([
-                    "Crooked, bare branches poke between dark green leaves. The hedges here are unkempt.",
-                    "Crooked, bare branches poke between dark green leaves. The gravel is thin and uneven.",
-                    "Crooked, bare branches poke between dark green leaves. Prickly shrubs cling around the base of the hedges.",
-                    "Crooked, bare branches poke between dark green leaves. The hedges here are stuggling and dark green leaves scatter upon the ground.",
-                    "Crooked, bare branches poke between dark green leaves. Even in this decrepitude, the hedges seem intent on containing you.",
-                    "Crooked, bare branches poke between dark green leaves. They remind you of " + (this.reminders.hands ? "your hands" : this.clickable("hands")) + " and the various structures within them.",
-                ]);
-                break;
+                        "Crooked, bare branches poke between dark green leaves. The hedges here are unkempt.",
+                        "Crooked, bare branches poke between dark green leaves. The gravel is thin and uneven.",
+                        "Crooked, bare branches poke between dark green leaves. Prickly shrubs cling around the base of the hedges.",
+                        "Crooked, bare branches poke between dark green leaves. The hedges here are stuggling and dark green leaves scatter upon the ground.",
+                        "Crooked, bare branches poke between dark green leaves. Even in this decrepitude, the hedges seem intent on containing you.",
+                        "Crooked, bare branches poke between dark green leaves. They remind you of " + (this.reminders.hands ? "your hands" : this.clickable("hands")) + " and the various structures within them.",
+                    ]);
+                    break;
                 case "arch": log += Rand.choice([
-                    "Brick archways form a small arbor amidst the hedges. They are cracked and crumbling, but hold the hedges at bay from this small place.",
-                    "Brick archways form a small arbor amidst the hedges. This small structure appears as a boat amidst the ocean of hedges.",
-                    "Brick archways form a small arbor amidst the hedges. There are no hedges in this little respite.",
-                    "Brick archways form a small arbor amidst the hedges. You can't help but wonder why this is here.",
-                    "Brick archways form a small arbor amidst the hedges. They remind you of " + (this.reminders.sand ? "time" : this.clickable("sand")) + " and " + (this.reminders.flour ? "flour" : this.clickable("flour")) + ".",
-                ]);
-                break;
+                        "Brick archways form a small arbor amidst the hedges. They are cracked and crumbling, but hold the hedges at bay from this small place.",
+                        "Brick archways form a small arbor amidst the hedges. This small structure appears as a boat amidst the ocean of hedges.",
+                        "Brick archways form a small arbor amidst the hedges. There are no hedges in this little respite.",
+                        "Brick archways form a small arbor amidst the hedges. You can't help but wonder why this is here.",
+                        "Brick archways form a small arbor amidst the hedges. They remind you of " + (this.reminders.sand ? "time" : this.clickable("sand")) + " and " + (this.reminders.flour ? "flour" : this.clickable("flour")) + ".",
+                    ]);
+                    break;
                 case "urn": log += Rand.choice([
-                    "An urn sits on a small pedestal. It is made of iron and appears very heavy.",
-                    "An urn sits on a small pedestal. The hedges here around it are thick.",
-                    "An urn sits on a small pedestal. Wrought iron rings give it two handles.",
-                    "An urn sits on a small pedestal. It reminds you of " + (this.reminders.love ? "losing something you love" : this.clickable("love")) + ".",
-                    "An urn sits on a small pedestal. It reflects little light.",
-                ]);
-                break;
+                        "An urn sits on a small pedestal. It is made of iron and appears very heavy.",
+                        "An urn sits on a small pedestal. The hedges here around it are thick.",
+                        "An urn sits on a small pedestal. Wrought iron rings give it two handles.",
+                        "An urn sits on a small pedestal. It reminds you of " + (this.reminders.love ? "losing something you love" : this.clickable("love")) + ".",
+                        "An urn sits on a small pedestal. It reflects little light.",
+                    ]);
+                    break;
                 case "dead": log += Rand.choice([
-                    "Hedges encircle you. Small, prickly shrubs cling around their base.",
-                    "Hedges encircle you. Their deep green leaves remind you of " + (this.reminders.breathing ? "not breathing" : this.clickable("breathing")) + ".",
-                    "Hedges encircle you. The gravel is coarse and scattered.",
-                    "Hedges encircle you. These thick forms seem intent on blotting out the sky.",
-                    "Hedges encircle you. They seem to make the air darker.",
-                ]);
-                break;
+                        "Hedges encircle you. Small, prickly shrubs cling around their base.",
+                        "Hedges encircle you. Their deep green leaves remind you of " + (this.reminders.breathing ? "not breathing" : this.clickable("breathing")) + ".",
+                        "Hedges encircle you. The gravel is coarse and scattered.",
+                        "Hedges encircle you. These thick forms seem intent on blotting out the sky.",
+                        "Hedges encircle you. They seem to make the air darker.",
+                    ]);
+                    break;
             }
 
             if (Rand.random() > 0.5) {
@@ -847,27 +852,27 @@
                     "It seems you've reached a dead end.",
                     "There's nowhere else to go but back.",
                 ]);
-                break;
+                    break;
                 case 2: log += Rand.choice([
                     "The path continues before you.",
                     "You may go back the way you came, or continue forwards.",
                     "A single route lies ahead.",
                 ]);
-                break;
+                    break;
                 case 3: log += Rand.choice([
                     "The road forks here.",
                     "You are presented with various options.",
                     "There are many paths available to you.",
                     "The path branches.",
                 ]);
-                break;
+                    break;
                 case 4: log += Rand.choice([
                     "Roads cross in all directions here.",
                     "This room is connected to all of its neighbors.",
                     "You may reach many places from here.",
                     "Here, many paths converge.",
                 ]);
-                break;
+                    break;
             }
             log += "<br>";
 
@@ -901,7 +906,7 @@
         get("start-menu").style.display = "none";
         get("container").style.display = "flex";
 
-        Labyrinth.updateLog({first: true});
+        Labyrinth.updateLog({ first: true });
 
         setInterval(() => {
             if (t > 1) t = 0;
@@ -932,9 +937,10 @@
             // ["#5555ff", 500],
             // ["#ff00ff", 500]
 
-            t += 0.005;
+            t += 0.000005;
         }, 16);
     }
 
 </script>
+
 </html>
