@@ -34,7 +34,7 @@
         }
 
         #background {
-            border: 13px solid #064a18;
+            border: 0.7vw solid #064a18;
             background: #72987b;
             width: 100vw;
             height: 100vh;
@@ -47,12 +47,12 @@
         }
 
         #start {
-            font-size: 20px;
+            font-size: 1.2vw;
             margin: auto;
             margin-top: 8px;
             padding: 3px;
             width: fit-content;
-            border: 1px solid black;
+            border: 2px solid black;
             cursor: pointer;
         }
 
@@ -65,16 +65,16 @@
         }
 
         #display {
-            width: 400px;
+            width: 20vw;
             text-align: left;
-            font-size: 18px;
+            font-size: 1.2vw;
             font-family: "GoudyBookletter";
         }
 
         #map {
             text-align: center;
-            width: 500px;
-            font-size: 16px;
+            width: 30vw;
+            font-size: 1vw;
             line-height: 1em;
             font-family: "Unifont";
         }
@@ -646,14 +646,14 @@
             } else if (text === "them") {
                 log += "You don't know how you know, but they would never hurt you. They would let you be anything.";
             } else if (text === "Pick a flower?") {
-                log += "You pick a flower! The stem connect it to the hedge gently breaks.<br>" + (this.self.wearingFlower ? "" : this.clickable("Put the flower in your hair?"));
+                log += "You pick a flower! The stem connecting it to the hedge gently breaks.<br>" + (this.self.wearingFlower ? "" : this.clickable("Put the flower in your hair?"));
                 this.self.hasFlower = true;
             } else if (text === "Put the flower in your hair?") {
                 log += "You put the white flower gently into your hair. It stays and you smile.";
                 this.self.hasFlower = false;
                 this.self.wearingFlower = true;
             } else if (text === "Put a flower atop the urn?") {
-                log += "You reach up and gently bestow the white flower on the urn's cover. It sits there and you observe how the white petals constant the dark metal. " + 
+                log += "You reach up and gently bestow the white flower on the urn's cover. It sits there and you observe how the white petals contrast the dark metal. " + 
                 "You feel a whisper that isn't there echoing " + Rand.choice(["forgiveness", "relief", "kindness", "nothingness", "a sigh", "melancholy", "a sense of moving on"]) + ".";
                 this.self.hasFlower = false;
                 this.currentRoom.hasFlower = true;
@@ -750,7 +750,7 @@
                         "Blooming hedges surround you. White flowers with yellow centers emerge from dark green leaves.",
                     ]);
                     if (!this.self.hasFlower)
-                        log += "<br>" + this.clickable("Pick a flower?");
+                        log += "<br>" + this.clickable("Pick a flower?") + " ";
                     break;
                 case "tree": log += Rand.choice([
                         "A single, thin tree sprouts from the gravel. Its grey branches hold tiny, green leaves.",
@@ -795,7 +795,7 @@
                         ]);
 
                     if (this.self.hasFlower && !this.currentRoom.hasFlower)
-                        log += "<br>" + this.clickable("Put a flower atop the urn?");
+                        log += "<br>" + this.clickable("Put a flower atop the urn?") + " ";
                     break;
                 case "dead": log += Rand.choice([
                         "Hedges encircle you. Small, prickly shrubs cling around their base.",
@@ -955,7 +955,7 @@
 
             get("background").style.background = color.getHex();
             get("container").style.color = color.inverse().asGreyscale().shaded(-70).getHex();
-            get("background").style.border = "13px solid " + color.shaded(-50).getHex();
+            get("background").style.border = "0.7vw solid " + color.shaded(-50).getHex();
 
             // ["#ff5555", 500], rainbow
             // ["#ffaa00", 500],
@@ -964,7 +964,7 @@
             // ["#5555ff", 500],
             // ["#ff00ff", 500]
 
-            t += 0.000005;
+            t += 0.00001;
         }, 16);
     }
 
