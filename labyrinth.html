@@ -65,7 +65,7 @@
         }
 
         #display {
-            width: 20vw;
+            width: 30vw;
             text-align: left;
             font-size: 1.2vw;
             font-family: "GoudyBookletter";
@@ -81,9 +81,10 @@
 
         .clickable {
             font-weight: bold;
+            color: ;
             cursor: pointer;
         }
-    </style>
+    </style> 
 </head>
 
 <body>
@@ -357,6 +358,7 @@
             this.posX;
             this.posY;
             this.currentRoom;
+            this.lastRoom;
             //this.discoveredRooms = [];
 
             // for (let i = 0; i < this.height; i++){
@@ -541,18 +543,18 @@
             let r = [];
 
             for (let i = 0; i < this.currentRoom.connections.length; i++) {
-                if (this.currentRoom.connections[i].x == this.posX) {
-                    if (this.currentRoom.connections[i].y == this.posY - 1) {
-                        r[0] = "You may go " + this.clickable("↟north↟", "Labyrinth.move(\"north\")") + "<br>";
-                    } else {
-                        r[1] = "You may go " + this.clickable("↡south↡", "Labyrinth.move(\"south\")") + "<br>";
-                    }
-                } else if (this.currentRoom.connections[i].y == this.posY) {
-                    if (this.currentRoom.connections[i].x == this.posX + 1) {
-                        r[2] = "You may go " + this.clickable("↠east↠", "Labyrinth.move(\"east\")") + "<br>";
-                    } else {
-                        r[3] = "You may go " + this.clickable("↞west↞", "Labyrinth.move(\"west\")") + "<br>";
-                    }
+                let cx = this.currentRoom.connections[i].x;
+                let cy = this.currentRoom.connections[i].y;
+                let isLast = this.lastRoom?.x === cx && this.lastRoom?.y === cy;
+                let isVisited = this.currentRoom.connections[i].discovered;
+                if (cx === this.posX) {
+                    if (cy === this.posY - 1)
+                        r[1] = "You may " + (isLast ? "return " : (isVisited ? "go " : "advance ")) + this.clickable("↟north↟", "Labyrinth.move(\"north\")") + "<br>";
+                    else r[2] = "You may " + (isLast ? "return " : (isVisited ? "go " : "advance ")) + this.clickable("↡south↡", "Labyrinth.move(\"south\")") + "<br>";
+                } else if (cy === this.posY) {
+                    if (cx === this.posX + 1)
+                        r[3] = "You may " + (isLast ? "return " : (isVisited ? "go " : "advance ")) + this.clickable("↠east↠", "Labyrinth.move(\"east\")") + "<br>";
+                    else r[4] = "You may " + (isLast ? "return " : (isVisited ? "go " : "advance ")) + this.clickable("↞west↞", "Labyrinth.move(\"west\")") + "<br>";
                 }
             }
 
@@ -567,10 +569,10 @@
             else if (d == "south") this.posY++;
             else if (d == "west") this.posX--;
 
+            this.lastRoom = this.currentRoom;
             this.currentRoom = this.rooms[this.posY][this.posX]
             this.currentRoom.discovered = true;
             this.currentRoom.timesVisited++;
-            console.log(this.currentRoom.timesVisited)
 
             // for (let i = 0; i < this.currentRoom.connections.length; i++) {
             //     this.connectRooms(this.discoveredRooms[this.posY][this.posX],
