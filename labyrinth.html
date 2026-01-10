@@ -33,6 +33,26 @@
             user-select: none;
         }
 
+        @keyframes initialize {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0%);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fade {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
         #background {
             border: 0.7vw solid #064a18;
             background: #72987b;
@@ -41,13 +61,16 @@
         }
 
         #start-menu {
-            padding-top: 40px;
-            font-size: 30px;
+            padding-top: 35vh;
+            font-size: 5vw;
+            font-family: "LindenHill";
             text-align: center;
+            animation-name: initialize;
+            animation-duration: 2s;
         }
 
         #start {
-            font-size: 1.2vw;
+            font-size: 1vw;
             margin: auto;
             margin-top: 8px;
             padding: 3px;
@@ -69,6 +92,11 @@
             text-align: left;
             font-size: 1.2vw;
             font-family: "GoudyBookletter";
+        }
+
+        .fade {
+            animation-name: fade;
+            animation-duration: 0.5s;
         }
 
         #map {
@@ -584,7 +612,8 @@
         }
 
         clickable(text, onclick = false) {
-            return "<span class='clickable' onclick='" + (onclick ? onclick : 'Labyrinth.read(\"' + text + '\")') + "'>" + text + "</span>";
+            return "<span class='clickable' onclick='get(\"display\").classList.add(\"fade\");" + 
+                                                    (onclick ? onclick : 'Labyrinth.read(\"' + text + '\")') + "'>" + text + "</span>";
         }
 
         read(text) {
@@ -647,7 +676,7 @@
             } else if (text === "them") {
                 log += "You don't know how you know, but they would never hurt you. They would let you be anything.";
             } else if (text === "Pick a flower?") {
-                log += "You pick a flower! The stem connecting it to the hedge gently breaks." + (this.self.wearingFlower ? "" : this.clickable("Put the flower in your hair?"));
+                log += "You pick a flower! The stem connecting it to the hedge gently breaks. " + (this.self.wearingFlower ? "" : this.clickable("Put the flower in your hair?"));
                 this.self.items.push("flower");
             } else if (text === "Put the flower in your hair?") {
                 log += "You put the white flower gently into your hair. It stays and you smile.";
@@ -962,6 +991,8 @@
         }
     }
 
+    document.get
+
     let t = 0;
     let Labyrinth = new Maze(14, 8);
     Labyrinth.generate(0, 3);
@@ -969,8 +1000,16 @@
     play();
 
     function play() {
+        let disp = get("display");
+        disp.addEventListener("animationstart", () => {
+            disp.style.pointerEvents = "none";
+        });
+        disp.addEventListener("animationend", () => {
+            disp.style.pointerEvents = "auto";
+            disp.classList.remove("fade");
+        });
         get("start-menu").style.display = "none";
-        get("container").style.display = "flex";
+        get("container").style.display = "flex";        
 
         Labyrinth.updateLog({ first: true });
 
