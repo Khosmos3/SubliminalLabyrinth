@@ -610,7 +610,7 @@
 
             r = r.filter(Boolean)
 
-            return (ret ? "You may " + this.clickable("stay here", "Labyrinth.updateLog({stay: false})") + ".<br>" : "") + r.join("");
+            return (ret ? "You may " + this.clickable("stay here", "Labyrinth.updateLog({stay: true})") + ".<br>" : "") + r.join("");
         }
 
         move(d) {
@@ -761,7 +761,7 @@
                 return;
             }
 
-            if (details.stay ?? true) {
+            if (!details.stay ?? true) {
                 if (this.currentRoom.timesVisited === 1) {
                     log += Rand.choice([
                         "This place is new.",
@@ -794,7 +794,7 @@
                     "You linger in this place.",
                     "You find yourself seated on the loose, plain gravel on the ground.",
                     "You rest here.", 
-                    "You in this place a bit longer.",
+                    "You remain in this place a bit longer.",
                 ]);
             }
 
@@ -914,10 +914,10 @@
                         "A single, thin tree sprouts from the gravel. It grows proudly in the middle of the path.",
                         "A single, thin tree sprouts from the gravel. It is still shorter than the hedges.",
                     ]);
-                    if (!this.currentRoom.hasShears) log += Rand.choice([
-                        "There are no shears here any longer.",
-                        "The shears are gone.",
-                        "The shears are missing. Their absence reminds you of " + (this.reminders.impermanence ? "how things are" : this.clickable("impermanence")) + ".",
+                    if (!this.currentRoom.hasShears && !details.stay) log += Rand.choice([
+                        " There are no shears here any longer.",
+                        " The shears are gone.",
+                        " The shears are no longer here. Their absence reminds you of " + (this.reminders.impermanence ? "how things are" : this.clickable("impermanence")) + ".",
                     ]);
                     break;
                 case "unkempt": log += Rand.choice([
@@ -974,26 +974,35 @@
                     else log += "Severed leaves and split branches carve a shoddy path beyond the crowded thicket, leading further into the labyrinth.";
 
                     if (this.self.items.includes("shears")) {
+                        let possible = [[this.posX, this.posY - 1, "N"],
+                                        [this.posX, this.posY + 1, "S"],
+                                        [this.posX + 1, this.posY, "E"],
+                                        [this.posX - 1, this.posY, "W"]];
+                        
+                        for (let i = 0; i < this.currentRoom.connections.length; i++) {
+                            let cx = this.currentRoom.connections[i].x;
+                            let cy = this.currentRoom.connections[i].y;
+
+                            for (let j = 0; j < possible.length; j++)
+                                if (possible[j][0] === cx && possible[j][1] === cy || !this.inBounds(possible[j][0], possible[j][1]))
+                                    possible.splice(j, 1);
+                        }
+
                         let r = [];
-
-                        // for (let i = 0; i < this.currentRoom.connections.length; i++) {
-                        //     let cx = this.currentRoom.connections[i].x;
-                        //     let cy = this.currentRoom.connections[i].y;
-
-                        //     if (cx !== this.posX && cy !== this.posY - 1)
-                        //         r[0] = "You may " + this.clickable("cut to the north") + ".<br>";
-                        //     else if (cx !== this.posX && cy !== this.posY - 1)
-                        //         r[1] = "You may " + this.clickable("cut to the south") + ".<br>";
-                        //     } else if (cy !== this.posY) {
-                        //         if (cx !== this.posX + 1)
-                        //             r[2] = "You may " + this.clickable("cut to the east") + ".<br>";
-                        //         else r[3] = "You may " + this.clickable("cut to the west") + ".<br>";
-                        //     }
-                        // }
+                        for (let i = 0; i < possible.length; i++) {
+                            if (possible[i][2] === "N")
+                                r[0] = "You may " + this.clickable("cut to the north") + ".";
+                            else if (possible[i][2] === "S")
+                                r[1] = "You may " + this.clickable("cut to the south") + ".";
+                            else if (possible[i][2] === "E")
+                                r[2] = "You may " + this.clickable("cut to the east") + ".";
+                            else if (possible[i][2] === "W")
+                                r[3] = "You may " + this.clickable("cut to the west") + ".";
+                        }
 
                         r = r.filter(Boolean)
 
-                        log += "<br>" + r.join("");
+                        log += "<br>" + r.join("<br>");
                     }
                     break;
             }
