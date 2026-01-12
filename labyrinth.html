@@ -53,6 +53,14 @@
             }
         }
 
+        #white {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            background-color: white;
+            display: none;
+        }
+
         #background {
             border: 0.7vw solid #064a18;
             background: #72987b;
@@ -63,7 +71,7 @@
         #start-menu {
             padding-top: 35vh;
             font-size: 5vw;
-            font-family: "LindenHill";
+            font-family: "GoudyBookletter";
             text-align: center;
             animation-name: initialize;
             animation-duration: 2s;
@@ -96,7 +104,12 @@
 
         .fade {
             animation-name: fade;
-            animation-duration: 0.5s;
+            animation-duration: 0.8s;
+        }
+
+        .fadeWhite {
+            animation-name: fade;
+            animation-duration: 3s;
         }
 
         #map {
@@ -115,10 +128,11 @@
 </head>
 
 <body>
+    <div id="white"></div>
     <div id="background">
         <div id="start-menu">
             The Labyrinth
-            <div id="start" onclick="play()">Enter</div>
+            <div id="start" onclick="get('white').style.display = 'inline'; get('white').classList.add('fadeWhite')">Enter</div>
         </div>
         <div id="container">
             <div id="map"></div>
@@ -997,6 +1011,12 @@
     let Labyrinth = new Maze(14, 8);
     Labyrinth.generate(0, 3);
 
+    let white = get("white");
+    white.addEventListener("animationend", () => {
+        white.classList.remove("fade");
+        play();
+    });
+
     play();
 
     function play() {
@@ -1008,6 +1028,8 @@
             disp.style.pointerEvents = "auto";
             disp.classList.remove("fade");
         });
+
+        white.style.display = "none";
         get("start-menu").style.display = "none";
         get("container").style.display = "flex";        
 
