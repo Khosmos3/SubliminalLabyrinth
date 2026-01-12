@@ -380,17 +380,18 @@
             this.numRooms = this.height * this.width;
             this.sizeCap = 100;
             this.size = 0;
-            this.roomsAddable = ["hall", "fountain", "bloom", "unkempt", "arch", "urn", "tree", "loop", "dead"];
+            this.roomsAddable = ["tree", "loop", "dead", "overgrown"];
             this.rooms = [];
             this.roomTiles = {
                 start: ["###", "#▩#", "###"],
                 hall: ["▒.▒", "  ,", "▒ ▒"],
                 fountain: [" . ", "'O ", "  ,"],
-                dead: ["▒░▒", "░░░", "▒░▒"],
+                dead: ["▒░▒", "░ ░", "▒░▒"],
                 empty: ["▓▓▓", "▓▓▓", "▓▓▓"],
                 loop: ["., ", "  .", "= ."],
                 bloom: ["❀ ", ",  ", " ✾"],
                 unkempt: ["▒X▒", "\\/.", "▒=▒"],
+                overgrown: ["▒▒▒", "▒░▒", "▒▒▒"],
                 arch: ["█∩█", "∩ ∩", "█∩█"],
                 urn: [", .", " ⬮ ", " \","],
                 tree: [",  ", " ⇞ ", "\"' "],
@@ -411,7 +412,7 @@
             this.reminders = {};
             this.self = {
                 understanding: 0,
-                items: [],
+                items: ["shears"],
                 wearingFlower: false,
             }
 
@@ -464,6 +465,7 @@
                             else if (t === "bloom") s += this.roomTiles.bloom[round - 1];
                             else if (t === "fountain") s += this.roomTiles.fountain[round - 1];
                             else if (t === "dead") s += this.roomTiles.dead[round - 1];
+                            else if (t === "overgrown") s += this.roomTiles.overgrown[round - 1];
 
                             if (this.currentRoom == rooms[i][j] && round == 2)
                                 s = s.substring(0, s.length - 2) + "<b>&</b>" + s.substring(s.length - 1);
@@ -522,6 +524,8 @@
                 this.addRoom(x, y);
             } else if (currentType === "tree" || currentType === "bloom") {
                 this.addRoom(x, y, 2);
+                if (currentType === "tree")
+                    currentRoom.hasShears = true;
             } else if (currentType === "urn") {
                 if (Rand.chance(0.5)) this.addRoom(x, y, 1);
             } else if (currentType === "fountain") {
@@ -529,12 +533,16 @@
             } else if (currentType === "loop") {
                 let valid = this.getNeighbors(x, y).filter(room => room.roomType !== "empty");
                 for (let i = 0; i < valid.length; i++)
-                    this.connectRooms(currentRoom, valid[i]);
+                    if (valid[i].roomType !== "overgrown")
+                        this.connectRooms(currentRoom, valid[i]);
             } else if (currentType === "arch") {
                 this.addRoom(x, y, 1);
                 let valid = this.getNeighbors(x, y).filter(room => room.roomType !== "empty");
                 for (let i = 0; i < valid.length; i++)
-                    this.connectRooms(currentRoom, valid[i]);
+                    if (valid[i].roomType !== "overgrown")
+                        this.connectRooms(currentRoom, valid[i]);
+            } else if (currentType === "overgrown") {
+                this.addRoom(x, y, 2, false);
             } else if (currentType === "dead") {
 
             } else { alert(currentType); }
@@ -543,7 +551,7 @@
 
         }
 
-        addRoom(x, y, numRooms = 1) {
+        addRoom(x, y, numRooms = 1, connect = true) {
             let valid;
             let newRoom;
 
@@ -554,7 +562,8 @@
                 newRoom = Rand.choice(valid);
                 newRoom.roomType = Rand.choice(this.roomsAddable);
                 newRoom.new = true;
-                this.connectRooms(this.rooms[y][x], newRoom);
+                if (connect)
+                    this.connectRooms(this.rooms[y][x], newRoom);
             }
         }
 
@@ -705,10 +714,37 @@
                 "You feel a whisper that isn't there echoing " + Rand.choice(["forgiveness", "relief", "kindness", "nothingness", "a sigh", "melancholy", "a sense of moving on"]) + ".";
                 this.self.items.splice(this.self.items.indexOf("flower"), 1);
                 this.currentRoom.hasFlower = true;
+            } else if (text === "shears") {
+                log += "A pair of shears is leaned into the edges near the corner of this room. It appears to have been placed their moments ago," + 
+                       "as if a passing gardener set them down after using them to sculpt the tree. The blades are sharp and new.<br>" + this.clickable("Pick up the shears?");
+            } else if (text === "cut to the north") {
+                log += "You use the shears, ripping through the hedges. Leaves rip asunder and bits of wood mix with the plain gravel.";
+                this.connectRooms(this.currentRoom, this.rooms[this.currentRoom.y - 1][this.currentRoom.x])
+            } else if (text === "cut to the south") {
+                log += "You use the shears, ripping through the hedges. Leaves rip asunder and bits of wood mix with the plain gravel.";
+                this.connectRooms(this.currentRoom, this.rooms[this.currentRoom.y + 1][this.currentRoom.x])
+            } else if (text === "cut to the east") {
+                log += "You use the shears, ripping through the hedges. Leaves rip asunder and bits of wood mix with the plain gravel.";
+                this.connectRooms(this.currentRoom, this.rooms[this.currentRoom.y][this.currentRoom.x + 1])
+            } else if (text === "cut to the west") {
+                log += "You use the shears, ripping through the hedges. Leaves rip asunder and bits of wood mix with the plain gravel.";
+                this.connectRooms(this.currentRoom, this.rooms[this.currentRoom.y][this.currentRoom.x - 1])
+            } else if (text === "Pick up the shears?") {
+                if (this.self.items.includes("shears")) {
+                    log += "You already have shears, feeling the weight of them carried at your side. You leave the shears.";
+                    this.currentRoom.hasShears = false;
+                } else {
+                    log += "You pick up the shears, hoisting their comfortable weight and feeling the heavy, wooden handle in your palm.";
+                    this.self.items.push("shears");
+                }
+                this.currentRoom.hasShears = false;
             } else if (text === "silly") {
                 this.reminders.silly = true;
                 log += "A smile dashes across your face. You feel light and floaty. When you look at things from far away, what matters? What gets distilled? " + 
                 "There is very little which truly matters in life and yet everything matters. The world is good, you are free, and there is nothing you cannot be."
+            } else if (text === "impermanence") {
+                this.reminders.impermanence = true;
+                log += "oooo hwoooooo thigns are impermanent woooooooooooooioajfwoipaja agh gahg h";
             }
 
             this.self.understanding++;
@@ -878,6 +914,11 @@
                         "A single, thin tree sprouts from the gravel. It grows proudly in the middle of the path.",
                         "A single, thin tree sprouts from the gravel. It is still shorter than the hedges.",
                     ]);
+                    if (!this.currentRoom.hasShears) log += Rand.choice([
+                        "There are no shears here any longer.",
+                        "The shears are gone.",
+                        "The shears are missing. Their absence reminds you of " + (this.reminders.impermanence ? "how things are" : this.clickable("impermanence")) + ".",
+                    ]);
                     break;
                 case "unkempt": log += Rand.choice([
                         "Crooked, bare branches poke between dark green leaves. The hedges here are unkempt.",
@@ -923,8 +964,44 @@
                         "Hedges encircle you. They seem to make the air darker.",
                     ]);
                     break;
+                case "overgrown": log += Rand.choice([
+                        "You push your way through dense hedges. Their thick branches and heavy leaves threaten to ensnare you.",
+                        "You push your way through dense hedges. The hedges wrestle one another, vying for the most exposure to the sun. Branches parry leaves, roots choke roots.",
+                        "You push your way through dense hedges. Leafy, jade-green walls form a sun-covering obstacle.",
+                    ]);
+                    if (this.currentRoom.connections.length <= 1)
+                        log += " You can just barely make out the labyrinth continuing through the tangle of plant material, but can't make it through with strength of your hands and feet alone.";
+                    else log += "Severed leaves and split branches carve a shoddy path beyond the crowded thicket, leading further into the labyrinth.";
+
+                    if (this.self.items.includes("shears")) {
+                        let r = [];
+
+                        // for (let i = 0; i < this.currentRoom.connections.length; i++) {
+                        //     let cx = this.currentRoom.connections[i].x;
+                        //     let cy = this.currentRoom.connections[i].y;
+
+                        //     if (cx !== this.posX && cy !== this.posY - 1)
+                        //         r[0] = "You may " + this.clickable("cut to the north") + ".<br>";
+                        //     else if (cx !== this.posX && cy !== this.posY - 1)
+                        //         r[1] = "You may " + this.clickable("cut to the south") + ".<br>";
+                        //     } else if (cy !== this.posY) {
+                        //         if (cx !== this.posX + 1)
+                        //             r[2] = "You may " + this.clickable("cut to the east") + ".<br>";
+                        //         else r[3] = "You may " + this.clickable("cut to the west") + ".<br>";
+                        //     }
+                        // }
+
+                        r = r.filter(Boolean)
+
+                        log += "<br>" + r.join("");
+                    }
+                    break;
             }
             
+            if (this.currentRoom.hasShears) {
+                log += " You notice a pair of " + this.clickable("shears") + ".";
+            }
+
             log += "<br><br>";
 
             switch (this.currentRoom.connections.length) {
@@ -978,7 +1055,7 @@
                         log += "You also have a very similar white flower tucked gently behind your ear.<br>";
                 }
                 else if (this.self.items[i] === "shears")
-                    log += "You're carrying a pair of gardening shears, sharp and cool.<br>";
+                    log += "You're carrying a pair of gardening shears, solid and cool.<br>";
             }
 
             if (!this.self.items.includes("flower") && this.self.wearingFlower)
@@ -998,6 +1075,7 @@
             this.discovered = false;
             this.timesVisited = 0;
             this.hasFlower = false;
+            this.hasShears = false;
         }
 
         connectsTo(x, y) {
