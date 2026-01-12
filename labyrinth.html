@@ -96,7 +96,7 @@
         }
 
         #display {
-            width: 30vw;
+            width: 31vw;
             text-align: left;
             font-size: 1.2vw;
             font-family: "GoudyBookletter";
@@ -114,7 +114,7 @@
 
         #map {
             text-align: center;
-            width: 30vw;
+            width: 31vw;
             font-size: 1vw;
             line-height: 1em;
             font-family: "Unifont";
@@ -380,7 +380,7 @@
             this.numRooms = this.height * this.width;
             this.sizeCap = 100;
             this.size = 0;
-            this.roomsAddable = ["tree", "loop", "dead", "overgrown"];
+            this.roomsAddable = ["hall", "fountain", "loop", "bloom", "unkempt", "arch", "urn", "tree", "loop", "dead", "overgrown"];
             this.rooms = [];
             this.roomTiles = {
                 start: ["###", "#▩#", "###"],
@@ -396,6 +396,7 @@
                 urn: [", .", " ⬮ ", " \","],
                 tree: [",  ", " ⇞ ", "\"' "],
             }
+            this.border = "❁═❁║❁═❁║";
 
             this.posX;
             this.posY;
@@ -424,10 +425,16 @@
         }
 
         map(rooms = this.rooms) {
-            let s = "";
+            let s = this.border[0];
+
+            for (let i = 0; i < this.width; i++)
+                s += this.border[1] + this.border[1] + this.border[1] + this.border[1];
+            s += this.border[2] + "\n";
 
             for (let i = 0; i < this.height; i++) {
                 for (let round = 0; round < 4; round++) {
+                    s += this.border[7];
+
                     for (let j = 0; j < this.width; j++) {
                         let t = rooms[i][j].roomType;
                         let c = rooms[i][j].connections;
@@ -471,14 +478,15 @@
                                 s = s.substring(0, s.length - 2) + "<b>&</b>" + s.substring(s.length - 1);
                         }
                     }
-                    s += "▓\n";
+                    s += "▓" + this.border[3] + "\n";
                 }
             }
 
+            s += this.border[6];
             for (let i = 0; i < this.width; i++)
-                s += "▓▓▓▓";
+                s += this.border[5] + this.border[5] + this.border[5] + this.border[5];
 
-            return s + "▓";
+            return s + this.border[4];
         }
 
         generate(x = Rand.intRange(0, this.width - 1), y = Rand.intRange(0, this.height - 1)) {
@@ -991,13 +999,13 @@
                         let r = [];
                         for (let i = 0; i < possible.length; i++) {
                             if (possible[i][2] === "N")
-                                r[0] = "You may " + this.clickable("cut to the north") + ".";
+                                r[0] = "You may use your shears to " + this.clickable("cut to the north") + ".";
                             else if (possible[i][2] === "S")
-                                r[1] = "You may " + this.clickable("cut to the south") + ".";
+                                r[1] = "You may use your shears to " + this.clickable("cut to the south") + ".";
                             else if (possible[i][2] === "E")
-                                r[2] = "You may " + this.clickable("cut to the east") + ".";
+                                r[2] = "You may use your shears to " + this.clickable("cut to the east") + ".";
                             else if (possible[i][2] === "W")
-                                r[3] = "You may " + this.clickable("cut to the west") + ".";
+                                r[3] = "You may use your shears to " + this.clickable("cut to the west") + ".";
                         }
 
                         r = r.filter(Boolean)
