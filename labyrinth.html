@@ -560,7 +560,7 @@
             }
 
             if (tile.connectsNearby) {
-                let valid = this.getNeighbors(x, y).filter(room => room.tile !== "empty");
+                let valid = this.getNeighbors(x, y).filter(room => room.tile.name !== "empty");
                 for (let i = 0; i < valid.length; i++)
                     if (valid[i].tile !== "overgrown")
                         this.connectRooms(currentRoom, valid[i]);
