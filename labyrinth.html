@@ -622,10 +622,10 @@
         }
 
         move(d) {
-            if (d == "north") this.posY--;
-            else if (d == "east") this.posX++;
-            else if (d == "south") this.posY++;
-            else if (d == "west") this.posX--;
+            if (d == "north" && this.inBounds(this.posX, this.posY - 1)) this.posY--;
+            else if (d == "east" && this.inBounds(this.posX, this.posY + 1)) this.posX++;
+            else if (d == "south" && this.inBounds(this.posX + 1, this.posY)) this.posY++;
+            else if (d == "west" && this.inBounds(this.posX - 1, this.posY)) this.posX--;
 
             this.lastRoom = this.currentRoom;
             this.currentRoom = this.rooms[this.posY][this.posX]
@@ -1095,12 +1095,25 @@
             this.hasShears = false;
         }
 
-        connectsTo(x, y) {
-            return this.connections.map(room => room.x + "-" + room.y).indexOf(x + "-" + y) !== -1;
+        connectsTo(x, y, relative = false) {
+            return this.connections.map(room => room.x + "-" + room.y).indexOf((relative ? x + this.x : x) + "-" + (relative ? y + this.y : y)) !== -1;
         }
     }
 
-    document.get
+    const pressedKeys = new Set();
+    document.addEventListener("keydown", (e) => pressedKeys.add(e.key));
+    document.addEventListener("keyup", (e) => pressedKeys.delete(e.key));
+    
+    const keyPressed = key => pressedKeys.has(key);
+    const handleInput = (input, offset) => input == 1 || input % offset == 1;
+    const Controls = {
+        moveNorth: { input: ["w", "ArrowUp"], active: 0 },
+        moveSouth: { input: ["s", "ArrowDown"], active: 0 },
+        moveWest: { input: ["a", "ArrowLeft"], active: 0 },
+        moveEast: { input: ["d", "ArrowRight"], active: 0 },
+        interact: { input: ["e"], active: 0 },
+        screenshot: { input: ["c"], active: 0 },
+    }
 
     let t = 0;
     let Labyrinth = new Maze(14, 8);
@@ -1131,6 +1144,30 @@
         Labyrinth.updateLog({ first: true });
 
         setInterval(() => {
+            for (const entry in Controls) {
+                let active = false;
+                for (let i = 0; i < Controls[entry].input.length; i++)
+                    active = keyPressed(Controls[entry].input[i]) ? true : active;
+                if (active) Controls[entry].active++;
+                else Controls[entry].active = 0;
+            }
+
+            if (handleInput(Controls.moveNorth.active, 50) && Labyrinth.currentRoom.connectsTo(0, -1, true)) {
+                Labyrinth.move("north");
+            }
+
+            if (handleInput(Controls.moveSouth.active, 50) && Labyrinth.currentRoom.connectsTo(0, 1, true)) {
+                Labyrinth.move("south");
+            }
+
+            if (handleInput(Controls.moveEast.active, 50) && Labyrinth.currentRoom.connectsTo(1, 0, true)) {
+                Labyrinth.move("east");
+            }
+
+            if (handleInput(Controls.moveWest.active, 50) && Labyrinth.currentRoom.connectsTo(-1, 0, true)) {
+                Labyrinth.move("west");
+            }
+
             if (t > 1) t = 0;
             let color = Color.chainColorLerp([
                 ["#b4c8ce", 7000],
