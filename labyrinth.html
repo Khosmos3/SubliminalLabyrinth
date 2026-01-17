@@ -17,11 +17,6 @@
         }
 
         @font-face {
-            font-family: LindenHill;
-            src: url("Fonts/Linden_Hill/LindenHill-Regular.ttf");
-        }
-
-        @font-face {
             font-family: GoudyBookletter;
             src: url("Fonts/Goudy_Bookletter_1911/GoudyBookletter1911-Regular.ttf");
         }
@@ -33,9 +28,20 @@
             user-select: none;
         }
 
-        @keyframes initialize {
+        @keyframes initializeTitle {
             0% {
-                transform: translateY(-100%);
+                transform: translateY(-200%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0%);
+                opacity: 1;
+            }
+        }
+
+        @keyframes initializeButton {
+            0% {
+                transform: translateY(100%);
                 opacity: 0;
             }
             100% {
@@ -53,6 +59,31 @@
             }
         }
 
+        .fade {
+            animation-name: fade;
+            animation-duration: 0.8s;
+        }
+
+        .menuFade {
+            animation-name: fade;
+            animation-duration: 1.2s;
+        }
+
+        .fadeWhite {
+            animation-name: fade;
+            animation-duration: 3s;
+        }
+
+        .initButtonAnimate {
+            animation-name: initializeButton;
+            animation-duration: 0.6s;
+        }
+
+        .titleAnimate {
+            animation-name: initializeTitle;
+            animation-duration: 2s;
+        }
+
         #white {
             width: 100vw;
             height: 100vh;
@@ -68,28 +99,40 @@
             height: 100vh;
         }
 
-        #start-menu {
+        #credits {
             padding-top: 35vh;
-            font-size: 5vw;
+            font-size: 2vw;
             font-family: "GoudyBookletter";
             text-align: center;
-            animation-name: initialize;
-            animation-duration: 2s;
+            display: none;
         }
 
-        #start {
+        #start-menu {
+            padding-top: 33vh;
+            text-align: center;
+        }
+
+        #title {
+            font-size: 5vw;
+            font-family: "GoudyBookletter";
+        }
+
+        .menuButton {
             font-size: 1vw;
             margin: auto;
-            margin-top: 8px;
+            margin-top: 1vw;
             padding: 3px;
             width: fit-content;
             border: 2px solid black;
             cursor: pointer;
         }
 
+        .initialButton {
+            display: none;
+        }
+
         #container {
             margin: auto;
-            display: flex;
             width: fit-content;
             padding: 13px;
             display: none;
@@ -100,16 +143,6 @@
             text-align: left;
             font-size: 1.2vw;
             font-family: "GoudyBookletter";
-        }
-
-        .fade {
-            animation-name: fade;
-            animation-duration: 0.8s;
-        }
-
-        .fadeWhite {
-            animation-name: fade;
-            animation-duration: 3s;
         }
 
         #map {
@@ -130,9 +163,26 @@
 <body>
     <div id="white"></div>
     <div id="background">
+        <div id="credits">
+            Programmed and imagined by Tom Steen<br>
+            Inspired from the prompt "A labyrinth"<br>
+            2025-2026
+            <div id="toMain" class="menuButton" onclick="
+                get('start-menu').classList.add('menuFade');
+                get('start-menu').style.display = 'block';
+                get('credits').style.display = 'none';
+                setTimeout(`get('credits').classList.add('start-menu');`, 1200)">Return</div>
+        </div>
         <div id="start-menu">
-            The Labyrinth
-            <div id="start" onclick="get('white').style.display = 'inline'; get('white').classList.add('fadeWhite')">Enter</div>
+            <div id="title" class="titleAnimate">The Labyrinth</div>
+            <div id="start" class="menuButton initialButton" onclick="
+                get('white').style.display = 'block';
+                get('white').classList.add('fadeWhite')">Enter the Labyrinth</div>
+            <div id="cred" class="menuButton initialButton" onclick="
+                get('credits').classList.add('menuFade');
+                get('start-menu').style.display = 'none';
+                get('credits').style.display = 'block';
+                setTimeout(`get('credits').classList.add('menuFade');`, 1200)">Credits</div>
         </div>
         <div id="container">
             <div id="map"></div>
@@ -373,6 +423,32 @@
         }
     }
 
+    class Tile {
+        constructor(name, tiles, details) {
+            this.name = name;
+            this.tiles = tiles;
+            
+            if (details?.func) this.func = details.func;
+            this.addableRooms = details?.addableRooms ?? 0;
+            this.connectAdded = details?.connectAdded ?? true;
+            this.connectsNearby = details?.connectsNearby ?? false;
+        }
+    }
+
+    const ROOMS_ADDABLE = {
+        hall: new Tile("hall", ["▒.▒", "  ,", "▒ ▒"], {addableRooms:  1}),
+        fountain: new Tile("fountain", [" . ", "'O ", "  ,"], {addableRooms:  3}),
+        bloom: new Tile("bloom", ["❀ ", ",  ", " ✾"], {addableRooms:  2}),
+        unkempt: new Tile("unkempt", ["▒X▒", "\\/.", "▒=▒"], {addableRooms:  1}),
+        arch: new Tile("arch", ["█∩█", "∩ ∩", "█∩█"], {addableRooms:  1, connectsNearby: true}),
+        urn: new Tile("urn", [", .", " ⬮ ", " \","], {addableRooms:  0.5}),
+        tree: new Tile("tree", [",  ", " ⇞ ", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.hasShears = true;}}),
+        loop: new Tile("loop", ["., ", "  .", "= ."], {connectsNearby: true}),
+        dead: new Tile("dead", ["▒░▒", "░ ░", "▒░▒"]),
+        overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  2, connectAdded: false}),
+    }
+
+
     class Maze {
         constructor(width, height) {
             this.height = height;
@@ -380,22 +456,7 @@
             this.numRooms = this.height * this.width;
             this.sizeCap = 100;
             this.size = 0;
-            this.roomsAddable = ["hall", "fountain", "loop", "bloom", "unkempt", "arch", "urn", "tree", "loop", "dead", "overgrown"];
             this.rooms = [];
-            this.roomTiles = {
-                start: ["###", "#▩#", "###"],
-                hall: ["▒.▒", "  ,", "▒ ▒"],
-                fountain: [" . ", "'O ", "  ,"],
-                dead: ["▒░▒", "░ ░", "▒░▒"],
-                empty: ["▓▓▓", "▓▓▓", "▓▓▓"],
-                loop: ["., ", "  .", "= ."],
-                bloom: ["❀ ", ",  ", " ✾"],
-                unkempt: ["▒X▒", "\\/.", "▒=▒"],
-                overgrown: ["▒▒▒", "▒░▒", "▒▒▒"],
-                arch: ["█∩█", "∩ ∩", "█∩█"],
-                urn: [", .", " ⬮ ", " \","],
-                tree: [",  ", " ⇞ ", "\"' "],
-            }
             this.border = "❁═❁║❁═❁║";
 
             this.posX;
@@ -413,7 +474,7 @@
             this.reminders = {};
             this.self = {
                 understanding: 0,
-                items: ["shears"],
+                items: [],
                 wearingFlower: false,
             }
 
@@ -436,7 +497,7 @@
                     s += this.border[7];
 
                     for (let j = 0; j < this.width; j++) {
-                        let t = rooms[i][j].roomType;
+                        let t = rooms[i][j].tile;
                         let c = rooms[i][j].connections;
 
                         if (!rooms[i][j].discovered) {
@@ -458,21 +519,7 @@
                                 s += (c.map(room => room.x).indexOf(j - 1) !== -1) ? " " : "▒";
                             else s += "▒";
 
-                            if (t === "start") s += this.roomTiles.start[round - 1];
-                            else if (t === "empty") s += this.roomTiles.empty[round - 1];
-                            else if (t === "hall") {
-                                // check connections!
-                                s += this.roomTiles.hall[round - 1];
-                            }
-                            else if (t === "loop") s += this.roomTiles.loop[round - 1]
-                            else if (t === "tree") s += this.roomTiles.tree[round - 1];
-                            else if (t === "unkempt") s += this.roomTiles.unkempt[round - 1];
-                            else if (t === "urn") s += this.roomTiles.urn[round - 1];
-                            else if (t === "arch") s += this.roomTiles.arch[round - 1];
-                            else if (t === "bloom") s += this.roomTiles.bloom[round - 1];
-                            else if (t === "fountain") s += this.roomTiles.fountain[round - 1];
-                            else if (t === "dead") s += this.roomTiles.dead[round - 1];
-                            else if (t === "overgrown") s += this.roomTiles.overgrown[round - 1];
+                            s += t.tiles[round - 1];
 
                             if (this.currentRoom == rooms[i][j] && round == 2)
                                 s = s.substring(0, s.length - 2) + "<b>&</b>" + s.substring(s.length - 1);
@@ -490,7 +537,7 @@
         }
 
         generate(x = Rand.intRange(0, this.width - 1), y = Rand.intRange(0, this.height - 1)) {
-            this.rooms[y][x].roomType = "start";
+            this.rooms[y][x].tile = new Tile("start", ["###", "#▩#", "###"], {addableRooms:  3});
             this.posX = x;
             this.posY = y;
             this.currentRoom = this.rooms[y][x];
@@ -502,58 +549,27 @@
             set(this.map(), "map")
         }
 
-        // display() {
-        //     let s = "";
-
-        //     for (let i = 0; i < this.height; i++){
-        //         for (let j = 0; j < this.width; j++) {
-        //             let t = this.rooms[i][j].roomType;
-        //             if (t == "start") s += "#";
-        //             else if (t == "empty") s += "X";
-        //             else if (t == "hall") s += "+";
-        //             else if (t == "fountain") s += "O";
-        //             else if (t == "dead") s += "=";
-        //         }
-        //         s += "\n";
-        //     }
-
-        //     console.log(s);
-        // }
-
         advance(x, y) {
             let currentRoom = this.rooms[y][x];
-            let currentType = currentRoom.roomType;
+            let tile = currentRoom.tile;
+
+            if (tile.addableRooms > 0) {
+                if (tile.addableRooms < 1 && Rand.chance(tile.addableRooms))
+                     this.addRoom(x, y, 1, tile.connectAdded);
+                else this.addRoom(x, y, tile.addableRooms, tile.connectAdded)
+            }
+
+            if (tile.connectsNearby) {
+                let valid = this.getNeighbors(x, y).filter(room => room.tile !== "empty");
+                for (let i = 0; i < valid.length; i++)
+                    if (valid[i].tile !== "overgrown")
+                        this.connectRooms(currentRoom, valid[i]);
+            }
+
+            if (tile?.func)
+                tile.func(currentRoom);
 
             currentRoom.new = false;
-
-            if (currentType === "start") {
-                this.addRoom(x, y, 3);
-            } else if (currentType === "hall" || currentType === "unkempt") {
-                this.addRoom(x, y);
-            } else if (currentType === "tree" || currentType === "bloom") {
-                this.addRoom(x, y, 2);
-                if (currentType === "tree")
-                    currentRoom.hasShears = true;
-            } else if (currentType === "urn") {
-                if (Rand.chance(0.5)) this.addRoom(x, y, 1);
-            } else if (currentType === "fountain") {
-                this.addRoom(x, y, 3);
-            } else if (currentType === "loop") {
-                let valid = this.getNeighbors(x, y).filter(room => room.roomType !== "empty");
-                for (let i = 0; i < valid.length; i++)
-                    if (valid[i].roomType !== "overgrown")
-                        this.connectRooms(currentRoom, valid[i]);
-            } else if (currentType === "arch") {
-                this.addRoom(x, y, 1);
-                let valid = this.getNeighbors(x, y).filter(room => room.roomType !== "empty");
-                for (let i = 0; i < valid.length; i++)
-                    if (valid[i].roomType !== "overgrown")
-                        this.connectRooms(currentRoom, valid[i]);
-            } else if (currentType === "overgrown") {
-                this.addRoom(x, y, 2, false);
-            } else if (currentType === "dead") {
-
-            } else { alert(currentType); }
 
             this.getNeighbors(x, y).forEach(room => room.new ? this.advance(room.x, room.y) : "");
 
@@ -564,11 +580,11 @@
             let newRoom;
 
             for (let i = 0; i < numRooms; i++) {
-                valid = this.getNeighbors(x, y).filter(room => room.roomType === "empty");
+                valid = this.getNeighbors(x, y).filter(room => room.tile.name === "empty");
                 if (valid.length == 0) return;
 
                 newRoom = Rand.choice(valid);
-                newRoom.roomType = Rand.choice(this.roomsAddable);
+                newRoom.tile = ROOMS_ADDABLE[Rand.choice(Object.keys(ROOMS_ADDABLE))];
                 newRoom.new = true;
                 if (connect)
                     this.connectRooms(this.rooms[y][x], newRoom);
@@ -632,11 +648,6 @@
             this.currentRoom.discovered = true;
             this.currentRoom.timesVisited++;
 
-            // for (let i = 0; i < this.currentRoom.connections.length; i++) {
-            //     this.connectRooms(this.discoveredRooms[this.posY][this.posX],
-            //                       this.discoveredRooms[this.currentRoom.connections[i][1]][this.currentRoom.connections[i][0]]);
-            // }
-
             set(this.map(), "map")
 
             this.updateLog();
@@ -653,59 +664,73 @@
                 log += "You can't remember what that would be other than where you are. " +
                     "If home is the place of one's birth, this is home. If home is where one lives and dies, this is home. " +
                     "If home is where one's heart lies...";
+                this.self.understanding++;
             } else if (text === "sleeping") {
                 this.reminders.sleeping = true;
                 log += "Being awake is like being asleep. You don't need to sleep, you are asleep, you are awake. It is <i>non-two</i>. " +
                     "Seeing with the eyes is like seeing with a dream. Neurons flash like rain making such eloquent reveries."
+                this.self.understanding++;
             } else if (text === "depths") {
                 this.reminders.depths = true;
                 log += "You know, but cannot admit, this is where you are. The depths. Something about the fresh air and the sun and moon circling above feels " +
                     "so impossibly deep, sundered, sunken. You can breathe, you can't breathe. It is <i>non-two</i>."
+                this.self.understanding++;
             } else if (text === "silence") {
                 this.reminders.silence = true;
                 log += "You pause for a second, letting still air caress your ear. No vibrations echo through you. It really is silent. " +
                     "The air itself feels like it could extinguish any word you'd say.";
+                this.self.understanding++;
             } else if (text === "hesitence") {
                 this.reminders.hesitence = true;
                 log += "You hesitate. There's something pure about such an action, something untainted. There's a oneness, a zenness, a suchness. " +
                     "You hesitate. In hesitence, there is the bare admission of hesitence, of letting the mind calculate and of being able to do nothing but. " +
                     "You hesitate. You are reminded of " + this.clickable("something else") + ".";
+                this.self.understanding++;
             } else if (text === "hallways") {
                 this.reminders.hallways = true;
                 log += "You remember another place, cold, sterile. You're unsure if this place is real or a fragment of a misfired neuron. Long, white halls stretch to the end of your vision. " +
                     "The tiles on the floor bear intricate engravings and tesselations. You look deep into their opaque, reflective depths then shiver, shake your head, and return to the labyrinth.";
+                this.self.understanding++;
             } else if (text === "keeping secrets") {
                 this.reminders.secrets = true;
                 log += "It seems like such a peculiar concept. Why would one conceal the truth? Why would one hide their actions? " +
                     "And from who? You think.<br><br>There's only one person you can seem to recall and even they are fleeting. Still, you're inexplicably certain you would never hide anything from "
                     + this.clickable("them") + ". There would be no reason to.";
+                this.self.understanding++;
             } else if (text === "sand") {
                 this.reminders.sand = true;
                 log += "How does something become sand? You ponder the gravel beneath your feet. Once, it may have been hulking, glacial boulders. Wind, <i>real</i> wind, could whittle it down. " +
                     "The rain, the changing of temperatures. The sea. Being embraced by and beaten by the elements in turn. Enduring. And for what loss? To soften? To spread across the world, to become a deeper part of the one that is everything? " +
                     "There is no loss in being worn down by time here.";
+                this.self.understanding++;
             } else if (text === "flour") {
                 this.reminders.flour = true;
                 log += "You narrow your memory, sifting particles of flour through the winnowing sieves of your mind. Bread. Warmth. Companionship. You are reminded of a certain richness " +
-                    "before another cool and silent breeze shakes you from the reverie.";
+                "before another cool and silent breeze shakes you from the reverie.";
+                this.self.understanding++;
             } else if (text === "breathing") {
                 this.reminders.breathing = true;
                 log += "You remember to breathe. Your shoulders slack and your stomach loosens. You relax. You breathe in. You breathe out. You realize nothing is happening." +
                     "No air flows in, no air flows out. Goosebumps manifest across your flesh. You tighten. In this system of the observer and the environment, which is not real?";
+                this.self.understanding++;
             } else if (text === "love") {
                 this.reminders.love = true;
                 log += "You can be reminded of love because you knew love. When? Across all of space, somewhere, everywhere, through the borders of the universe and the constraints of light, you had felt love. " +
                     "Who? All souls, together, as one. All souls, <i>not one, not-two</i>. A soul, someone, sigular. Different from you, not different from you. Love. " +
                     "<br><br>You can't really remember.";
+                this.self.understanding++;
             } else if (text === "hands") {
                 this.reminders.hands = true;
                 log += "You look down at your hands, then lift them directly before your eyes. You clench your fists, then splay your fingers as wide as they will go. " +
                     "You fold each finger individually, watching how the shadows they cast dance and change. You look closer at the dark lines, crevasses, etches in your skin. " +
                     "You realize such small, beautiful details are rare here. How wonderful it is to occupy a body.";
+                this.self.understanding++;
             } else if (text === "something else") {
                 log += "You remember you are alive in the world. You remember that life is allowed to have meaning. You are reminded of meaning and of laughing and of having nothing to do. You almost remember somebody.";
+                this.self.understanding++;
             } else if (text === "them") {
                 log += "You don't know how you know, but they would never hurt you. They would let you be anything.";
+                this.self.understanding++;
             } else if (text === "Pick a flower?") {
                 log += "You pick a flower! The stem connecting it to the hedge gently breaks. " + (this.self.wearingFlower ? "" : this.clickable("Put the flower in your hair?"));
                 this.self.items.push("flower");
@@ -713,6 +738,7 @@
                 log += "You put the white flower gently into your hair. It stays and you smile.";
                 this.self.items.splice(this.self.items.indexOf("flower"), 1);
                 this.self.wearingFlower = true;
+                this.self.understanding++;
             } else if (text === "Take it off?") {
                 log += "You slide the white flower from your hair. The rough stem slightly tugs as you pull it out into your hand.";
                 this.self.items.push("flower");
@@ -722,6 +748,7 @@
                 "You feel a whisper that isn't there echoing " + Rand.choice(["forgiveness", "relief", "kindness", "nothingness", "a sigh", "melancholy", "a sense of moving on"]) + ".";
                 this.self.items.splice(this.self.items.indexOf("flower"), 1);
                 this.currentRoom.hasFlower = true;
+                this.self.understanding++;
             } else if (text === "shears") {
                 log += "A pair of shears is leaned into the edges near the corner of this room. It appears to have been placed their moments ago," + 
                        "as if a passing gardener set them down after using them to sculpt the tree. The blades are sharp and new.<br>" + this.clickable("Pick up the shears?");
@@ -749,13 +776,14 @@
             } else if (text === "silly") {
                 this.reminders.silly = true;
                 log += "A smile dashes across your face. You feel light and floaty. When you look at things from far away, what matters? What gets distilled? " + 
-                "There is very little which truly matters in life and yet everything matters. The world is good, you are free, and there is nothing you cannot be."
+                "There is very little which truly matters in life and yet everything matters. The world is good, you are free, and there is nothing you cannot be.";
+                this.self.understanding++;
             } else if (text === "impermanence") {
                 this.reminders.impermanence = true;
-                log += "oooo hwoooooo thigns are impermanent woooooooooooooioajfwoipaja agh gahg h";
+                log += "How can something go into nothing? Likewise, how can something arise from nothing? Truly, in interconnectedness, there are no things which can disappear, but therefore there are no things which can be created. Something and nothing are <i>not-two</i>. The world appears to be here, created from nothing, when it is simply nothingness/somethingness returned onto itself. All other appearances are likewise empty.";
+                this.self.understanding++;
             }
 
-            this.self.understanding++;
             set(log + "<br><br>" + Labyrinth.generateDirections(true));
         }
 
@@ -871,7 +899,7 @@
 
             log += "<br>";
 
-            switch (this.currentRoom.roomType) {
+            switch (this.currentRoom.tile.name) {
                 case "start": log += Rand.choice([
                         "The ground here is rough. Small, broken tiles cover it.",
                         "The ground here is rough. This is where you began.",
@@ -979,7 +1007,7 @@
                     ]);
                     if (this.currentRoom.connections.length <= 1)
                         log += " You can just barely make out the labyrinth continuing through the tangle of plant material, but can't make it through with strength of your hands and feet alone.";
-                    else log += "Severed leaves and split branches carve a shoddy path beyond the crowded thicket, leading further into the labyrinth.";
+                    else log += " Severed leaves and split branches carve a shoddy path beyond the crowded thicket, leading further into the labyrinth.";
 
                     if (this.self.items.includes("shears")) {
                         let possible = [[this.posX, this.posY - 1, "N"],
@@ -1086,7 +1114,7 @@
         constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.roomType = "empty";
+            this.tile = new Tile("empty", ["▓▓▓", "▓▓▓", "▓▓▓"]);
             this.new = false;
             this.connections = [];
             this.discovered = false;
@@ -1116,14 +1144,30 @@
     }
 
     let t = 0;
+    let gameOpened = false;
     let Labyrinth = new Maze(14, 8);
     Labyrinth.generate(0, 3);
 
     let white = get("white");
     white.addEventListener("animationend", () => {
-        white.classList.remove("fade");
         play();
     });
+
+    get("title").addEventListener("animationend", () => {
+        get("start").style.display = "block";
+        get("start").classList.add("initButtonAnimate");
+        get("title").classList.remove("titleAnimate");
+    })
+
+    get("start").addEventListener("animationend", () => {
+        get("cred").style.display = "block";
+        get("cred").classList.add("initButtonAnimate");
+        get("start").classList.remove("initButtonAnimate");
+    })
+
+    get("cred").addEventListener("animationend", () => {
+        get("cred").classList.remove("initButtonAnimate");
+    })
 
     play();
 
