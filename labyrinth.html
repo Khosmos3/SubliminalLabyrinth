@@ -639,8 +639,8 @@
 
         move(d) {
             if (d == "north" && this.inBounds(this.posX, this.posY - 1)) this.posY--;
-            else if (d == "east" && this.inBounds(this.posX, this.posY + 1)) this.posX++;
-            else if (d == "south" && this.inBounds(this.posX + 1, this.posY)) this.posY++;
+            else if (d == "south" && this.inBounds(this.posX, this.posY + 1)) this.posY++;
+            else if (d == "east" && this.inBounds(this.posX + 1, this.posY)) this.posX++;
             else if (d == "west" && this.inBounds(this.posX - 1, this.posY)) this.posX--;
 
             this.lastRoom = this.currentRoom;
@@ -649,7 +649,6 @@
             this.currentRoom.timesVisited++;
 
             set(this.map(), "map")
-
             this.updateLog();
         }
 
@@ -1124,6 +1123,8 @@
         }
 
         connectsTo(x, y, relative = false) {
+            //console.log(this.connections.map(room => room.x + "-" + room.y).indexOf((relative ? x + this.x : x) + "-" + (relative ? y + this.y : y)) !== -1);
+
             return this.connections.map(room => room.x + "-" + room.y).indexOf((relative ? x + this.x : x) + "-" + (relative ? y + this.y : y)) !== -1;
         }
     }
