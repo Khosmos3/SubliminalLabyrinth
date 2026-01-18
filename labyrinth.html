@@ -17,11 +17,6 @@
         }
 
         @font-face {
-            font-family: LindenHill;
-            src: url("Fonts/Linden_Hill/LindenHill-Regular.ttf");
-        }
-
-        @font-face {
             font-family: GoudyBookletter;
             src: url("Fonts/Goudy_Bookletter_1911/GoudyBookletter1911-Regular.ttf");
         }
@@ -113,7 +108,7 @@
         }
 
         #start-menu {
-            padding-top: 35vh;
+            padding-top: 33vh;
             text-align: center;
         }
 
@@ -708,59 +703,73 @@
                 log += "You can't remember what that would be other than where you are. " +
                     "If home is the place of one's birth, this is home. If home is where one lives and dies, this is home. " +
                     "If home is where one's heart lies...";
+                this.self.understanding++;
             } else if (text === "sleeping") {
                 this.reminders.sleeping = true;
                 log += "Being awake is like being asleep. You don't need to sleep, you are asleep, you are awake. It is <i>non-two</i>. " +
                     "Seeing with the eyes is like seeing with a dream. Neurons flash like rain making such eloquent reveries."
+                this.self.understanding++;
             } else if (text === "depths") {
                 this.reminders.depths = true;
                 log += "You know, but cannot admit, this is where you are. The depths. Something about the fresh air and the sun and moon circling above feels " +
                     "so impossibly deep, sundered, sunken. You can breathe, you can't breathe. It is <i>non-two</i>."
+                this.self.understanding++;
             } else if (text === "silence") {
                 this.reminders.silence = true;
                 log += "You pause for a second, letting still air caress your ear. No vibrations echo through you. It really is silent. " +
                     "The air itself feels like it could extinguish any word you'd say.";
+                this.self.understanding++;
             } else if (text === "hesitence") {
                 this.reminders.hesitence = true;
                 log += "You hesitate. There's something pure about such an action, something untainted. There's a oneness, a zenness, a suchness. " +
                     "You hesitate. In hesitence, there is the bare admission of hesitence, of letting the mind calculate and of being able to do nothing but. " +
                     "You hesitate. You are reminded of " + this.clickable("something else") + ".";
+                this.self.understanding++;
             } else if (text === "hallways") {
                 this.reminders.hallways = true;
                 log += "You remember another place, cold, sterile. You're unsure if this place is real or a fragment of a misfired neuron. Long, white halls stretch to the end of your vision. " +
                     "The tiles on the floor bear intricate engravings and tesselations. You look deep into their opaque, reflective depths then shiver, shake your head, and return to the labyrinth.";
+                this.self.understanding++;
             } else if (text === "keeping secrets") {
                 this.reminders.secrets = true;
                 log += "It seems like such a peculiar concept. Why would one conceal the truth? Why would one hide their actions? " +
                     "And from who? You think.<br><br>There's only one person you can seem to recall and even they are fleeting. Still, you're inexplicably certain you would never hide anything from "
                     + this.clickable("them") + ". There would be no reason to.";
+                this.self.understanding++;
             } else if (text === "sand") {
                 this.reminders.sand = true;
                 log += "How does something become sand? You ponder the gravel beneath your feet. Once, it may have been hulking, glacial boulders. Wind, <i>real</i> wind, could whittle it down. " +
                     "The rain, the changing of temperatures. The sea. Being embraced by and beaten by the elements in turn. Enduring. And for what loss? To soften? To spread across the world, to become a deeper part of the one that is everything? " +
                     "There is no loss in being worn down by time here.";
+                this.self.understanding++;
             } else if (text === "flour") {
                 this.reminders.flour = true;
                 log += "You narrow your memory, sifting particles of flour through the winnowing sieves of your mind. Bread. Warmth. Companionship. You are reminded of a certain richness " +
-                    "before another cool and silent breeze shakes you from the reverie.";
+                "before another cool and silent breeze shakes you from the reverie.";
+                this.self.understanding++;
             } else if (text === "breathing") {
                 this.reminders.breathing = true;
                 log += "You remember to breathe. Your shoulders slack and your stomach loosens. You relax. You breathe in. You breathe out. You realize nothing is happening." +
                     "No air flows in, no air flows out. Goosebumps manifest across your flesh. You tighten. In this system of the observer and the environment, which is not real?";
+                this.self.understanding++;
             } else if (text === "love") {
                 this.reminders.love = true;
                 log += "You can be reminded of love because you knew love. When? Across all of space, somewhere, everywhere, through the borders of the universe and the constraints of light, you had felt love. " +
                     "Who? All souls, together, as one. All souls, <i>not one, not-two</i>. A soul, someone, sigular. Different from you, not different from you. Love. " +
                     "<br><br>You can't really remember.";
+                this.self.understanding++;
             } else if (text === "hands") {
                 this.reminders.hands = true;
                 log += "You look down at your hands, then lift them directly before your eyes. You clench your fists, then splay your fingers as wide as they will go. " +
                     "You fold each finger individually, watching how the shadows they cast dance and change. You look closer at the dark lines, crevasses, etches in your skin. " +
                     "You realize such small, beautiful details are rare here. How wonderful it is to occupy a body.";
+                this.self.understanding++;
             } else if (text === "something else") {
                 log += "You remember you are alive in the world. You remember that life is allowed to have meaning. You are reminded of meaning and of laughing and of having nothing to do. You almost remember somebody.";
+                this.self.understanding++;
             } else if (text === "them") {
                 log += "You don't know how you know, but they would never hurt you. They would let you be anything.";
+                this.self.understanding++;
             } else if (text === "Pick a flower?") {
                 log += "You pick a flower! The stem connecting it to the hedge gently breaks. " + (this.self.wearingFlower ? "" : this.clickable("Put the flower in your hair?"));
                 this.self.items.push("flower");
@@ -768,6 +777,7 @@
                 log += "You put the white flower gently into your hair. It stays and you smile.";
                 this.self.items.splice(this.self.items.indexOf("flower"), 1);
                 this.self.wearingFlower = true;
+                this.self.understanding++;
             } else if (text === "Take it off?") {
                 log += "You slide the white flower from your hair. The rough stem slightly tugs as you pull it out into your hand.";
                 this.self.items.push("flower");
@@ -777,6 +787,7 @@
                 "You feel a whisper that isn't there echoing " + Rand.choice(["forgiveness", "relief", "kindness", "nothingness", "a sigh", "melancholy", "a sense of moving on"]) + ".";
                 this.self.items.splice(this.self.items.indexOf("flower"), 1);
                 this.currentRoom.hasFlower = true;
+                this.self.understanding++;
             } else if (text === "shears") {
                 log += "A pair of shears is leaned into the edges near the corner of this room. It appears to have been placed their moments ago," + 
                        "as if a passing gardener set them down after using them to sculpt the tree. The blades are sharp and new.<br>" + this.clickable("Pick up the shears?");
@@ -804,13 +815,14 @@
             } else if (text === "silly") {
                 this.reminders.silly = true;
                 log += "A smile dashes across your face. You feel light and floaty. When you look at things from far away, what matters? What gets distilled? " + 
-                "There is very little which truly matters in life and yet everything matters. The world is good, you are free, and there is nothing you cannot be."
+                "There is very little which truly matters in life and yet everything matters. The world is good, you are free, and there is nothing you cannot be.";
+                this.self.understanding++;
             } else if (text === "impermanence") {
                 this.reminders.impermanence = true;
-                log += "oooo hwoooooo thigns are impermanent woooooooooooooioajfwoipaja agh gahg h";
+                log += "How can something go into nothing? Likewise, how can something arise from nothing? Truly, in interconnectedness, there are no things which can disappear, but therefore there are no things which can be created. Something and nothing are <i>not-two</i>. The world appears to be here, created from nothing, when it is simply nothingness/somethingness returned onto itself. All other appearances are likewise empty.";
+                this.self.understanding++;
             }
 
-            this.self.understanding++;
             set(log + "<br><br>" + Labyrinth.generateDirections(true));
         }
 
