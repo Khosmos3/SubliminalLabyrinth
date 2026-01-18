@@ -33,9 +33,20 @@
             user-select: none;
         }
 
-        @keyframes initialize {
+        @keyframes initializeTitle {
             0% {
-                transform: translateY(-100%);
+                transform: translateY(-200%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0%);
+                opacity: 1;
+            }
+        }
+
+        @keyframes initializeButton {
+            0% {
+                transform: translateY(100%);
                 opacity: 0;
             }
             100% {
@@ -53,6 +64,31 @@
             }
         }
 
+        .fade {
+            animation-name: fade;
+            animation-duration: 0.8s;
+        }
+
+        .menuFade {
+            animation-name: fade;
+            animation-duration: 1.2s;
+        }
+
+        .fadeWhite {
+            animation-name: fade;
+            animation-duration: 3s;
+        }
+
+        .initButtonAnimate {
+            animation-name: initializeButton;
+            animation-duration: 0.6s;
+        }
+
+        .titleAnimate {
+            animation-name: initializeTitle;
+            animation-duration: 2s;
+        }
+
         #white {
             width: 100vw;
             height: 100vh;
@@ -68,28 +104,40 @@
             height: 100vh;
         }
 
-        #start-menu {
+        #credits {
             padding-top: 35vh;
-            font-size: 5vw;
+            font-size: 2vw;
             font-family: "GoudyBookletter";
             text-align: center;
-            animation-name: initialize;
-            animation-duration: 2s;
+            display: none;
         }
 
-        #start {
+        #start-menu {
+            padding-top: 35vh;
+            text-align: center;
+        }
+
+        #title {
+            font-size: 5vw;
+            font-family: "GoudyBookletter";
+        }
+
+        .menuButton {
             font-size: 1vw;
             margin: auto;
-            margin-top: 8px;
+            margin-top: 1vw;
             padding: 3px;
             width: fit-content;
             border: 2px solid black;
             cursor: pointer;
         }
 
+        .initialButton {
+            display: none;
+        }
+
         #container {
             margin: auto;
-            display: flex;
             width: fit-content;
             padding: 13px;
             display: none;
@@ -100,16 +148,6 @@
             text-align: left;
             font-size: 1.2vw;
             font-family: "GoudyBookletter";
-        }
-
-        .fade {
-            animation-name: fade;
-            animation-duration: 0.8s;
-        }
-
-        .fadeWhite {
-            animation-name: fade;
-            animation-duration: 3s;
         }
 
         #map {
@@ -130,9 +168,26 @@
 <body>
     <div id="white"></div>
     <div id="background">
+        <div id="credits">
+            Programmed and imagined by Tom Steen<br>
+            Inspired from the prompt "A labyrinth"<br>
+            2025-2026
+            <div id="toMain" class="menuButton" onclick="
+                get('start-menu').classList.add('menuFade');
+                get('start-menu').style.display = 'block';
+                get('credits').style.display = 'none';
+                setTimeout(`get('credits').classList.add('start-menu');`, 1200)">Return</div>
+        </div>
         <div id="start-menu">
-            The Labyrinth
-            <div id="start" onclick="get('white').style.display = 'inline'; get('white').classList.add('fadeWhite')">Enter</div>
+            <div id="title" class="titleAnimate">The Labyrinth</div>
+            <div id="start" class="menuButton initialButton" onclick="
+                get('white').style.display = 'block';
+                get('white').classList.add('fadeWhite')">Enter the Labyrinth</div>
+            <div id="cred" class="menuButton initialButton" onclick="
+                get('credits').classList.add('menuFade');
+                get('start-menu').style.display = 'none';
+                get('credits').style.display = 'block';
+                setTimeout(`get('credits').classList.add('menuFade');`, 1200)">Credits</div>
         </div>
         <div id="container">
             <div id="map"></div>
@@ -1100,19 +1155,33 @@
         }
     }
 
-    document.get
-
     let t = 0;
+    let gameOpened = false;
     let Labyrinth = new Maze(14, 8);
     Labyrinth.generate(0, 3);
 
     let white = get("white");
     white.addEventListener("animationend", () => {
-        white.classList.remove("fade");
         play();
     });
 
-    play();
+    get("title").addEventListener("animationend", () => {
+        get("start").style.display = "block";
+        get("start").classList.add("initButtonAnimate");
+        get("title").classList.remove("titleAnimate");
+    })
+
+    get("start").addEventListener("animationend", () => {
+        get("cred").style.display = "block";
+        get("cred").classList.add("initButtonAnimate");
+        get("start").classList.remove("initButtonAnimate");
+    })
+
+    get("cred").addEventListener("animationend", () => {
+        get("cred").classList.remove("initButtonAnimate");
+    })
+
+    //play();
 
     function play() {
         let disp = get("display");
