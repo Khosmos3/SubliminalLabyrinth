@@ -437,15 +437,16 @@
 
     const ROOMS_ADDABLE = {
         hall: new Tile("hall", ["▒.▒", "  ,", "▒ ▒"], {addableRooms:  1}),
+        grassy: new Tile("grassy", ["⢆⡊⢍", "⡁⡐⡴", "⡊⢄⢝"], {addableRooms: 2}),
         fountain: new Tile("fountain", [" . ", "'O ", "  ,"], {addableRooms:  3, func: (currentRoom) => {currentRoom.effect = Rand.intRange(0, 4)}}),
-        // bloom: new Tile("bloom", ["❀ ", ",  ", " ✾"], {addableRooms:  2}),
-        // unkempt: new Tile("unkempt", ["▒X▒", "\\/.", "▒=▒"], {addableRooms:  1}),
-        // arch: new Tile("arch", ["█∩█", "∩ ∩", "█∩█"], {addableRooms:  1, connectsNearby: true}),
-        // urn: new Tile("urn", [", .", " ⬮ ", " \","], {addableRooms:  0.5}),
-        // tree: new Tile("tree", [",  ", " ⇞ ", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.hasShears = true;}}),
-        // loop: new Tile("loop", ["., ", "  .", "= ."], {connectsNearby: true}),
-        // dead: new Tile("dead", ["▒░▒", "░ ░", "▒░▒"]),
-        // overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  2, connectAdded: false}),
+        bloom: new Tile("bloom", ["❀ ", ",  ", " ✾"], {addableRooms:  2}),
+        unkempt: new Tile("unkempt", ["▒X▒", "\\/.", "▒=▒"], {addableRooms:  1}),
+        arch: new Tile("arch", ["█∩█", "∩ ∩", "█∩█"], {addableRooms:  1, connectsNearby: true}),
+        urn: new Tile("urn", [", .", " ⬮ ", " \","], {addableRooms:  0.5}),
+        tree: new Tile("tree", [",  ", " ⇞ ", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.hasShears = true;}}),
+        loop: new Tile("loop", ["., ", "  .", "= ."], {connectsNearby: true}),
+        dead: new Tile("dead", ["▒░▒", "░ ░", "▒░▒"]),
+        overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  2, connectAdded: false}),
     }
 
 
@@ -954,6 +955,15 @@
                         "Hedges line your way. The air smells fresh and woody.",
                     ]);
                     break;
+                case "grassy": log += Rand.choice([
+                        "Hedges tousle grassy ground. The gravel gives way to short, green grass.",
+                        "Hedges tousle grassy ground. Instead of gravel, soft grass caresses your bare feet.",
+                        "Hedges tousle grassy ground. Looking closely into the feathery fronds, you see no insects.",
+                        "Hedges tousle grassy ground. It would be comfortable to lie down here.",
+                        "Hedges tousle grassy ground. You wonder what allows such friendly flora to inhabit this place.",
+                        "Hedges tousle grassy ground. The hedges seem relaxed and lenient.",
+                    ]);
+                    break;
                 case "loop": log += Rand.choice([
                         "Hedges grow around you. Small, white flowers eke around their base.",
                         "Hedges grow around you. The gravel below you is a greyish-white.",
@@ -1204,6 +1214,7 @@
         screenshot: { input: ["c"], active: 0 },
     }
 
+    let universeType = Rand.choice["knots", "particles", "wave-particles", "waves", "fibers", "tempers", "strings", "pixels", "fragmented thoughts", "perceptions"];
     let currentEffect = false;
     let backgroundColor = new Color("#ffffff")
     let t = 0;
