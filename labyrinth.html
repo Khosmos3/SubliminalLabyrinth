@@ -437,15 +437,15 @@
 
     const ROOMS_ADDABLE = {
         hall: new Tile("hall", ["▒.▒", "  ,", "▒ ▒"], {addableRooms:  1}),
-        fountain: new Tile("fountain", [" . ", "'O ", "  ,"], {addableRooms:  3}),
-        bloom: new Tile("bloom", ["❀ ", ",  ", " ✾"], {addableRooms:  2}),
-        unkempt: new Tile("unkempt", ["▒X▒", "\\/.", "▒=▒"], {addableRooms:  1}),
-        arch: new Tile("arch", ["█∩█", "∩ ∩", "█∩█"], {addableRooms:  1, connectsNearby: true}),
-        urn: new Tile("urn", [", .", " ⬮ ", " \","], {addableRooms:  0.5}),
-        tree: new Tile("tree", [",  ", " ⇞ ", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.hasShears = true;}}),
-        loop: new Tile("loop", ["., ", "  .", "= ."], {connectsNearby: true}),
-        dead: new Tile("dead", ["▒░▒", "░ ░", "▒░▒"]),
-        overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  2, connectAdded: false}),
+        fountain: new Tile("fountain", [" . ", "'O ", "  ,"], {addableRooms:  3, func: (currentRoom) => {currentRoom.effect = Rand.intRange(0, 4)}}),
+        // bloom: new Tile("bloom", ["❀ ", ",  ", " ✾"], {addableRooms:  2}),
+        // unkempt: new Tile("unkempt", ["▒X▒", "\\/.", "▒=▒"], {addableRooms:  1}),
+        // arch: new Tile("arch", ["█∩█", "∩ ∩", "█∩█"], {addableRooms:  1, connectsNearby: true}),
+        // urn: new Tile("urn", [", .", " ⬮ ", " \","], {addableRooms:  0.5}),
+        // tree: new Tile("tree", [",  ", " ⇞ ", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.hasShears = true;}}),
+        // loop: new Tile("loop", ["., ", "  .", "= ."], {connectsNearby: true}),
+        // dead: new Tile("dead", ["▒░▒", "░ ░", "▒░▒"]),
+        // overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  2, connectAdded: false}),
     }
 
 
@@ -562,7 +562,7 @@
             if (tile.connectsNearby) {
                 let valid = this.getNeighbors(x, y).filter(room => room.tile.name !== "empty");
                 for (let i = 0; i < valid.length; i++)
-                    if (valid[i].tile !== "overgrown")
+                    if (valid[i].tile.name !== "overgrown")
                         this.connectRooms(currentRoom, valid[i]);
             }
 
@@ -781,6 +781,45 @@
                 this.reminders.impermanence = true;
                 log += "How can something go into nothing? Likewise, how can something arise from nothing? Truly, in interconnectedness, there are no things which can disappear, but therefore there are no things which can be created. Something and nothing are <i>not-two</i>. The world appears to be here, created from nothing, when it is simply nothingness/somethingness returned onto itself. All other appearances are likewise empty.";
                 this.self.understanding++;
+            } else if (text === "Sip") {
+                log += Rand.choice([
+                    "You drink from the fountain, wetting your dry lips.",
+                    "You bend your face toward the mirror of the fountain's surface and drink.",
+                    "You sip the water. It is cool and smooth.",
+                    "The water tastes strange.",
+                    "You drink from the fountain, carefully scooping water with your hands to your mouth.",
+                ]);
+                console.log(this.currentRoom.effect)
+                log += " " + [
+                    "The chilly water makes you feel refreshed.",
+                    "The chilly water makes you feel refreshed.",
+                    "You feel sick and throw up next to the fountain.",
+                    "You feel ecstatic. The world spins in a million beautiful colors.",
+                    "You collapse to the ground, eyes skyward. The sky becomes a blur of days and nights. It feels as if a thousands years pass by before you come to.",
+                ][this.currentRoom.effect];
+
+                if (this.currentRoom.effect === 4) {
+                    currentEffect = new BackgroundEffect((x) => Color.chainColorLerp([
+                        [backgroundColor.getHex(), 50],
+                        ["#eeeeee", 10], ["#dddddd", 10],
+                        ["#eeeeee", 10], ["#ffffff", 10],
+                        ["#eeeeee", 10], ["#dddddd", 10],
+                        ["#eeeeee", 10], ["#cccccc", 10],
+                        ["#eeeeee", 10], ["#dddddd", 10],
+                        ["#eeeeee", 10], ["#dddddd", 10],
+                        ["#eeeeee", 10], ["#dddddd", 10],
+                        ["#eeeeee", 10], ["#ffffff", 10],
+                        ["#eeeeee", 10], ["#dddddd", 10],
+                        ["#eeeeee", 10], ["#cccccc", 10],
+                        ["#eeeeee", 10], ["#dddddd", 10],
+                        ["#eeeeee", 20], ["#dddddd", 20],
+                        ["#eeeeee", 30], ["#dddddd", 30],
+                        ["#eeeeee", 40], ["#dddddd", 40],
+                        ["#eeeeee", 200],
+                    ], x), 300)
+                    t = 0.7;
+                }
+                
             }
 
             set(log + "<br><br>" + Labyrinth.generateDirections(true));
@@ -930,6 +969,12 @@
                         "A fountain quietly bubbles here. The stone which composes it is worn.",
                         "A fountain quietly bubbles here. Small, dulled reliefs decorate its edges.",
                         "A fountain quietly bubbles here. Its bowl is not deep. A few small stones rest at its bottom.",
+                    ]);
+                    log += "<br>" + this.clickable("Sip") + Rand.choice([
+                        " from the fountain?",
+                        " deeply from the fountain?",
+                        " and sate yourself upon the fountain?",
+                        " the waters of the fountain?",
                     ]);
                     break;
                 case "bloom": log += Rand.choice([
@@ -1120,12 +1165,27 @@
             this.timesVisited = 0;
             this.hasFlower = false;
             this.hasShears = false;
+            this.effect = -1;
         }
 
         connectsTo(x, y, relative = false) {
             //console.log(this.connections.map(room => room.x + "-" + room.y).indexOf((relative ? x + this.x : x) + "-" + (relative ? y + this.y : y)) !== -1);
-
             return this.connections.map(room => room.x + "-" + room.y).indexOf((relative ? x + this.x : x) + "-" + (relative ? y + this.y : y)) !== -1;
+        }
+    }
+
+    class BackgroundEffect {
+        constructor(lerp, length) {
+            this.lerp = lerp;
+            this.length = length;
+            this.progress = 0;
+            this.complete = false;
+        }
+
+        update(t) {
+            this.progress+= 1;
+            if (this.progress >= this.length - 1) this.complete = true;
+            return (this.progress <= this.length) ? this.lerp(this.progress / this.length) : false;
         }
     }
 
@@ -1144,6 +1204,8 @@
         screenshot: { input: ["c"], active: 0 },
     }
 
+    let currentEffect = false;
+    let backgroundColor = new Color("#ffffff")
     let t = 0;
     let gameOpened = false;
     let Labyrinth = new Maze(14, 8);
@@ -1213,9 +1275,15 @@
                 Labyrinth.move("west");
             }
 
+            if (handleInput(Controls.interact.active, 500)) {
+                currentEffect = new BackgroundEffect((x) => Color.chainColorLerp(
+                    [["#ffffff", 100],
+                    ["#000000", 100]], x), 200);
+            }
+
             if (t > 1) t = 0;
-            let color = Color.chainColorLerp([
-                ["#b4c8ce", 7000],
+            backgroundColor = Color.chainColorLerp([
+                ["#b4c8ce", 700],
                 ["#dbedf3", 10000],
                 ["#afe6f6", 12000],
                 ["#a4d0f0", 10000],
@@ -1228,11 +1296,18 @@
                 ["#2d0a4f", 6000],
                 ["#060426", 15000],
                 ["#040215", 10000],
-            ], t);
+            ], t);                
 
-            get("background").style.background = color.getHex();
-            get("container").style.color = color.inverse().asGreyscale().shaded(-70).getHex();
-            get("background").style.border = "0.7vw solid " + color.shaded(-50).getHex();
+            if (currentEffect && !currentEffect.complete) {
+                backgroundColor = currentEffect.update(t);
+            }
+            // console.log(backgroundColor)
+
+            // console.log(t)
+
+            get("background").style.background = backgroundColor.getHex();
+            get("container").style.color = backgroundColor.inverse().asGreyscale().shaded(-70).getHex();
+            get("background").style.border = "0.7vw solid " + backgroundColor.shaded(-50).getHex();
 
             // ["#ff5555", 500], rainbow
             // ["#ffaa00", 500],
@@ -1241,7 +1316,7 @@
             // ["#5555ff", 500],
             // ["#ff00ff", 500]
 
-            t += 0.00001;
+            t += 0.00002;
         }, 16);
     }
 
