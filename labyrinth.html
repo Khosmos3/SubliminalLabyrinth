@@ -8,7 +8,12 @@
     <style>
         @font-face {
             font-family: Unifont;
-            src: url("Fonts/Unifont.ttf");
+            src: url("Fonts/Unifont/Unifont.ttf");
+        }
+
+        @font-face {
+            font-family: Unifont_Upper;
+            src: url("Fonts/Unifont/Unifont_Upper.otf") format("opentype");
         }
 
         @font-face {
@@ -150,7 +155,7 @@
             width: 31vw;
             font-size: 1vw;
             line-height: 1em;
-            font-family: "Unifont";
+            font-family: "Unifont", "Unifont_Upper";
         }
 
         .clickable {
@@ -447,9 +452,9 @@
         loop: new Tile("loop", ["., ", "  .", "= ."], {connectsNearby: true}),
         dead: new Tile("dead", ["▒░▒", "░ ░", "▒░▒"]),
         overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  2, connectAdded: false}),
-        well: new Tile("well", [], {addableRooms: 1}),
-        coin: new Tile("coin", [], {func: (currentRoom) => {currentRoom.items.push("coin")}}),
-        dire: new Tile("dire", ["wow", "omg", "lol"], {connectsNearby: true, addableRooms: 1.25, func: (c) => {console.log("Wolf is here!")}})
+        //well: new Tile("well", ["aaa", "aaa", "aaa"], {addableRooms: 1}),
+        //coin: new Tile("coin", ["𐪊𐪊𐪊", "111", "111"], {func: (currentRoom) => {currentRoom.items.push("coin")}}),
+        //dire: new Tile("dire", ["wow", "omg", "lol"], {connectsNearby: true, addableRooms: 1.25, func: (c) => {console.log("Wolf is here!")}})
     }
 
 
@@ -1173,7 +1178,7 @@
             this.tile = new Tile("empty", ["▓▓▓", "▓▓▓", "▓▓▓"]);
             this.new = false;
             this.connections = [];
-            this.discovered = false;
+            this.discovered = true;
             this.timesVisited = 0;
             this.items = [];
             this.effect = -1;
