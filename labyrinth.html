@@ -440,21 +440,28 @@
         }
     }
 
+
+    // ࿄༒   
     const ROOMS_ADDABLE = {
         hall: new Tile("hall", ["▒.▒", "  ,", "▒ ▒"], {addableRooms:  1}),
         grassy: new Tile("grassy", ["⢆⡊⢍", "⡁⡐⡴", "⡊⢄⢝"], {addableRooms: 2}),
-        fountain: new Tile("fountain", [" . ", "'O ", "  ,"], {addableRooms:  3, func: (currentRoom) => {currentRoom.effect = Rand.intRange(0, 4)}}),
-        bloom: new Tile("bloom", ["❀ ", ",  ", " ✾"], {addableRooms:  2}),
+        fountain: new Tile("fountain", [" . ", "'𐜧 ", "  ,"], {addableRooms:  3, func: (currentRoom) => {currentRoom.effect = Rand.intRange(0, 4)}}),
+        bloom: new Tile("bloom", ["❀ ", ",  ", " ❀"], {addableRooms:  2}),
         unkempt: new Tile("unkempt", ["▒X▒", "\\/.", "▒=▒"], {addableRooms:  1}),
         arch: new Tile("arch", ["█∩█", "∩ ∩", "█∩█"], {addableRooms:  1, connectsNearby: true}),
         urn: new Tile("urn", [", .", " ⬮ ", " \","], {addableRooms:  0.5}),
-        tree: new Tile("tree", [",  ", " ⇞ ", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.items.push("shears")}}),
+        tree: new Tile("tree", [",  ", ".𐤅.", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.items.push("shears")}}),
         loop: new Tile("loop", ["., ", "  .", "= ."], {connectsNearby: true}),
         dead: new Tile("dead", ["▒░▒", "░ ░", "▒░▒"]),
-        overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  2, connectAdded: false}),
-        //well: new Tile("well", ["aaa", "aaa", "aaa"], {addableRooms: 1}),
-        //coin: new Tile("coin", ["𐪊𐪊𐪊", "111", "111"], {func: (currentRoom) => {currentRoom.items.push("coin")}}),
+        overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  1, connectAdded: false}),
+        well: new Tile("well", ["aaa", "aaa", "aaa"], {addableRooms: 1}),
         //dire: new Tile("dire", ["wow", "omg", "lol"], {connectsNearby: true, addableRooms: 1.25, func: (c) => {console.log("Wolf is here!")}})
+    }
+
+    const ROOMS_OTHER = {
+        start: new Tile("start", ["###", "#▩#", "###"], {addableRooms:  3}),
+        empty: new Tile("empty", ["▓▓▓", "▓▓▓", "▓▓▓"]),
+        coin: new Tile("coin", ["▛ ▜", " ▃ ", "▙ ▟"], {func: (currentRoom) => {currentRoom.items.push("coin")}}),
     }
 
 
@@ -531,12 +538,18 @@
                             s += t.tiles[round - 1];
 
                             if (this.currentRoom == rooms[i][j] && round == 2)
-                                s = s.substring(0, s.length - 2) + "<b>&</b>" + s.substring(s.length - 1);
+                                s = s.substring(0, s.length - (s[s.length-2].codePointAt(0) > 50000 ? 3 : 2)).replace("�", "")
+                                    + "<b>&</b>" + s.substring(s.length - 1);
                         }
                     }
                     s += "▓" + this.border[3] + "\n";
                 }
             }
+
+            s += this.border[3] + "▓";
+            for (let i = 0; i < this.width; i++)
+                s += "▓▓▓▓";
+            s += this.border[7] + "\n";
 
             s += this.border[6];
             for (let i = 0; i < this.width; i++)
@@ -546,7 +559,7 @@
         }
 
         generate(x = Rand.intRange(0, this.width - 1), y = Rand.intRange(0, this.height - 1)) {
-            this.rooms[y][x].tile = new Tile("start", ["###", "#▩#", "###"], {addableRooms:  3});
+            this.rooms[y][x].tile = ROOMS_OTHER.start;
             this.posX = x;
             this.posY = y;
             this.currentRoom = this.rooms[y][x];
@@ -568,10 +581,14 @@
                 else this.addRoom(x, y, tile.addableRooms, tile.connectAdded)
             }
 
+            if (tile.name === "overgrown") {
+                this.addRoom(x, y, 1, true, ROOMS_OTHER.coin);
+            }
+
             if (tile.connectsNearby) {
                 let valid = this.getNeighbors(x, y).filter(room => room.tile.name !== "empty");
                 for (let i = 0; i < valid.length; i++)
-                    if (valid[i].tile.name !== "overgrown")
+                    if (valid[i].tile.name !== "overgrown" && valid[i].tile.name !== "coin")
                         this.connectRooms(currentRoom, valid[i]);
             }
 
@@ -584,7 +601,7 @@
 
         }
 
-        addRoom(x, y, numRooms = 1, connect = true) {
+        addRoom(x, y, numRooms = 1, connect = true, room = false) {
             let valid;
             let newRoom;
 
@@ -593,7 +610,7 @@
                 if (valid.length == 0) return;
 
                 newRoom = Rand.choice(valid);
-                newRoom.tile = ROOMS_ADDABLE[Rand.choice(Object.keys(ROOMS_ADDABLE))];
+                newRoom.tile = room ? room : ROOMS_ADDABLE[Rand.choice(Object.keys(ROOMS_ADDABLE))];
                 newRoom.new = true;
                 if (connect)
                     this.connectRooms(this.rooms[y][x], newRoom);
@@ -1175,7 +1192,7 @@
         constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.tile = new Tile("empty", ["▓▓▓", "▓▓▓", "▓▓▓"]);
+            this.tile = ROOMS_OTHER.empty;
             this.new = false;
             this.connections = [];
             this.discovered = true;
