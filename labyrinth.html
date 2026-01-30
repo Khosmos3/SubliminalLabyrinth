@@ -1439,15 +1439,15 @@
 
             // console.log(t)
 
-            get("background").style.background = backgroundColor.added(new Color([0, 255, 0]), 1).getHex();
+            get("background").style.background = backgroundColor.getHex();
             get("container").style.color = backgroundColor.inverse().asGreyscale().shaded(-70).getHex();
             get("background").style.border = "0.7vw solid " + backgroundColor.shaded(-50).getHex();
             let clickables = get("clickable");
             let clickMatches = document.querySelectorAll(".clickable");
             for (let i = 0; i < clickables.length; i++) {
-                if (!clickMatches[i].matches(':hover')) clickables[i].style.backgroundColor = backgroundColor.inverse().asGreyscale().shiftedR(20).shaded(200).getHex();
-                else if (!clickMatches[i].matches(':active')) clickables[i].style.backgroundColor = backgroundColor.shaded(40).getHex();
-                else clickables[i].style.backgroundColor = backgroundColor.shaded(30).getHex();
+                if (!clickMatches[i].matches(':hover')) clickables[i].style.backgroundColor = backgroundColor.shaded(25).getHex();
+                else if (!clickMatches[i].matches(':active')) clickables[i].style.backgroundColor = backgroundColor.shaded(80).shiftedB(-30).getHex();
+               else clickables[i].style.backgroundColor = backgroundColor.shaded(-50).shaded(30).getHex();
             }
 
             // ["#ff5555", 500], rainbow
@@ -1457,7 +1457,7 @@
             // ["#5555ff", 500],
             // ["#ff00ff", 500]
 
-            t += 0.002;
+            t += 0.0002;
         }, 16);
     }
 
