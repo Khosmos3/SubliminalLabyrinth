@@ -161,6 +161,8 @@
         .clickable {
             font-weight: bold;
             cursor: pointer;
+            background-color: #b4c8ce;
+            transition: background-color 0.6s;
         }
     </style> 
 </head>
@@ -197,7 +199,7 @@
 </body>
 <script>
     function get(id) {
-        return document.getElementById(id);
+        return document.getElementById(id) ?? document.getElementsByClassName(id);
     }
 
     function set(text, id = "display") {
@@ -426,6 +428,48 @@
 
             return out;
         }
+
+        shiftR(amount) {
+            this.r = Math.round(clamp(this.r + amount, 0, 255));
+        }
+
+        shiftedR(amount) {
+            return new Color([Math.round(clamp(this.r + amount, 0, 255)), this.g, this.b]);
+        }
+
+        static shiftR(color, amount) {
+            if (typeof color !== "Color") color = new Color(color);
+
+            return new Color([Math.round(clamp(color.r + amount, 0, 255)), color.g, color.b]);
+        }
+
+        shiftG(amount) {
+            this.g = Math.round(clamp(this.g + amount, 0, 255));
+        }
+
+        shiftedG(amount) {
+            return new Color([this.r, Math.round(clamp(this.g + amount, 0, 255)), this.b]);
+        }
+
+        static shiftG(color, amount) {
+            if (typeof color !== "Color") color = new Color(color);
+
+            return new Color([color.r, Math.round(clamp(color.g + amount, 0, 255)), color.b]);
+        }
+
+        shiftB(amount) {
+            this.b = Math.round(clamp(this.b + amount, 0, 255));
+        }
+
+        shiftedB(amount) {
+            return new Color([this.r, this.g, Math.round(clamp(this.b + amount, 0, 255))]);
+        }
+
+        static shiftB(color, amount) {
+            if (typeof color !== "Color") color = new Color(color);
+
+            return new Color([color.r, color.g, Math.round(clamp(color.b + amount, 0, 255))]);
+        }
     }
 
     class Tile {
@@ -582,7 +626,7 @@
             }
 
             if (tile.name === "overgrown") {
-                this.addRoom(x, y, 1, true, ROOMS_OTHER.coin);
+                this.addRoom(x, y, 1, false, ROOMS_OTHER.coin);
             }
 
             if (tile.connectsNearby) {
@@ -1195,7 +1239,7 @@
             this.tile = ROOMS_OTHER.empty;
             this.new = false;
             this.connections = [];
-            this.discovered = true;
+            this.discovered = false;
             this.timesVisited = 0;
             this.items = [];
             this.effect = -1;
@@ -1342,7 +1386,13 @@
             get("background").style.background = backgroundColor.getHex();
             get("container").style.color = backgroundColor.inverse().asGreyscale().shaded(-70).getHex();
             get("background").style.border = "0.7vw solid " + backgroundColor.shaded(-50).getHex();
-
+            let clickables = get("clickable");
+            let clickMatches = document.querySelectorAll(".clickable");
+            for (let i = 0; i < clickables.length; i++) {
+                if (!clickMatches[i].matches(':hover')) clickables[i].style.backgroundColor = backgroundColor.inverse().asGreyscale().shiftedR(20).getHex();
+                else if (!clickMatches[i].matches(':active')) clickables[i].style.backgroundColor = backgroundColor.shaded(40).getHex();
+                else clickables[i].style.backgroundColor = backgroundColor.shaded(30).getHex();
+            }
             // ["#ff5555", 500], rainbow
             // ["#ffaa00", 500],
             // ["#ffff00", 500],
@@ -1350,7 +1400,7 @@
             // ["#5555ff", 500],
             // ["#ff00ff", 500]
 
-            t += 0.00002;
+            t += 0.002;
         }, 16);
     }
 
