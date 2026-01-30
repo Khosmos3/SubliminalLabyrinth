@@ -470,6 +470,62 @@
 
             return new Color([color.r, color.g, Math.round(clamp(color.b + amount, 0, 255))]);
         }
+
+        add(color, amount) {
+            this.r = Math.round(clamp(this.r + color.r*amount, 0, 255));
+            this.g = Math.round(clamp(this.g + color.g*amount, 0, 255));
+            this.b = Math.round(clamp(this.b + color.b*amount, 0, 255));
+        }
+
+        added(color, amount) {
+            let out = new Color();
+
+            out.r = Math.round(clamp(this.r + color.r*amount, 0, 255));
+            out.g = Math.round(clamp(this.g + color.g*amount, 0, 255));
+            out.b = Math.round(clamp(this.b + color.b*amount, 0, 255));
+
+            return out;
+        }
+
+        static add(color1, color2, amount) {
+            if (typeof color1 !== "Color") color1 = new Color(color1);
+
+            let out = new Color();
+
+            out.r = Math.round(clamp(color1.r + color2.r*amount, 0, 255));
+            out.g = Math.round(clamp(color1.g + color2.g*amount, 0, 255));
+            out.b = Math.round(clamp(color1.b + color2.b*amount, 0, 255));
+
+            return out;
+        }
+
+        average(color) {
+            this.r = Math.round((this.r + color.r) / 2);
+            this.g = Math.round((this.g + color.g) / 2);
+            this.b = Math.round((this.b + color.b) / 2);
+        }
+
+        averaged(color) {
+            let out = new Color();
+
+            out.r = Math.round((this.r + color.r) / 2);
+            out.g = Math.round((this.g + color.g) / 2);
+            out.b = Math.round((this.b + color.b) / 2);
+
+            return out;
+        }
+
+        average(color1, color2) {
+            if (typeof color1 !== "Color") color1 = new Color(color1);
+
+            let out = new Color();
+
+            out.r = Math.round((color1.r + color2.r) / 2);
+            out.g = Math.round((color1.g + color2.g) / 2);
+            out.b = Math.round((color1.b + color2.b) / 2);
+
+            return out;
+        }
     }
 
     class Tile {
@@ -1383,16 +1439,17 @@
 
             // console.log(t)
 
-            get("background").style.background = backgroundColor.getHex();
+            get("background").style.background = backgroundColor.added(new Color([0, 255, 0]), 1).getHex();
             get("container").style.color = backgroundColor.inverse().asGreyscale().shaded(-70).getHex();
             get("background").style.border = "0.7vw solid " + backgroundColor.shaded(-50).getHex();
             let clickables = get("clickable");
             let clickMatches = document.querySelectorAll(".clickable");
             for (let i = 0; i < clickables.length; i++) {
-                if (!clickMatches[i].matches(':hover')) clickables[i].style.backgroundColor = backgroundColor.inverse().asGreyscale().shiftedR(20).getHex();
+                if (!clickMatches[i].matches(':hover')) clickables[i].style.backgroundColor = backgroundColor.inverse().asGreyscale().shiftedR(20).shaded(200).getHex();
                 else if (!clickMatches[i].matches(':active')) clickables[i].style.backgroundColor = backgroundColor.shaded(40).getHex();
                 else clickables[i].style.backgroundColor = backgroundColor.shaded(30).getHex();
             }
+
             // ["#ff5555", 500], rainbow
             // ["#ffaa00", 500],
             // ["#ffff00", 500],
