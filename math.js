@@ -103,6 +103,18 @@ class Rand {
             w
         );
     }
+
+    static octave(paramsInput, paramsOther, noiseFunction, n, persistence = 0.5, lacunarity = 2) {
+        let p = 0;
+        let amplitude = 1;
+        let frequency = 1;
+        for (let i = 0; i < n; i++) {
+            p += amplitude*noiseFunction(...paramsInput.map(p => p*frequency), ...paramsOther);
+            amplitude *= persistence;
+            frequency *= lacunarity;
+        }
+        return p;
+    }
 }
 
 class Vector3D {

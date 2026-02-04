@@ -78,6 +78,8 @@ function play() {
     Labyrinth.updateLog({ first: true });
 
     let permutation = makePermutation();
+    let permutation2 = makePermutation();
+
     setInterval(() => {
         c.clearRect(0, 0, WIDTH, HEIGHT);
 
@@ -106,48 +108,65 @@ function play() {
             Labyrinth.move("west");
         }
 
-        let res = 5;
+        let res = 8;
         let p = 0;
-        let freq = 0.01;
-        let amp = 1;
+        let p2;
 
         for (let i = 0; i < WIDTH; i+=res) {
             for (let j = 0; j < HEIGHT; j+=res) {
                 p = 0;
-                freq = 0.005;
-                amp = 1;
-                for (let o = 0; o < 2; o++) {
-                    p += amp*Rand.perlin3D((i)*freq, (j)*freq, (t+day)*10000*freq, permutation);
-                    freq *= 3;
-                    amp *= 0.5;
-                }
 
-                p = (p + 1) / 2;
-                // if (p > 0.95) {
-                //     c.fillStyle = "#737272ff"
-                //     c.globalAlpha = p;
-                //     c.fillRect(i, j, res, res);
-                // } else if (p > 0.7) {
-                //     c.fillStyle = "green"
-                //     c.globalAlpha = p;
-                //     c.fillRect(i, j, res, res);
-                // } else if (p > 0.65) {
-                //     c.globalAlpha = 1;
-                //     c.fillStyle = "#ffe8b3ff";
-                //     c.fillRect(i, j, res, res);
-                // } else if (p > 0.64) {
-                //     c.fillStyle = "white"
-                //     c.fillRect(i, j, res, res);
-                // } else {
-                if (p > 0.45 && p < 0.55) {
+                let freq = 0.002;
+                // let amplitude = 1;
+                // let frequency = 0.003;
+                // let persistence = 0.5;
+                // let lacunarity = 2;
+                // for (let w = 0; w < 3; w++) {
+                //     p += amplitude*Rand.perlin3D(i*frequency, j*frequency, (t+day)*10000*frequency, permutation);
+                //     amplitude *= persistence;
+                //     frequency *= lacunarity;
+                // }
+
+                p = Rand.octave([i*freq, j*freq, (t+day)*10], [permutation], Rand.perlin3D, 4);
+
+                p = clamp((p + 1) / 2, 0, 1);
+
+                if (p > 0.995) {
                     c.fillStyle = "white"
-                    c.globalAlpha = 1-p;
+                    c.globalAlpha = p;
+                    c.fillRect(i, j, res, res);
+                } else if (p > 0.8) {
+                    c.fillStyle = "#737272ff"
+                    c.globalAlpha = (1-p)+0.7;
+                    c.fillRect(i, j, res, res);
+                } else if (p > 0.65) {
+                    c.fillStyle = "green"
+                    c.globalAlpha = p;
+                    c.fillRect(i, j, res, res);
+                } else if (p > 0.6) {
+                    c.globalAlpha = 1;
+                    c.fillStyle = "#ffe8b3ff";
+                    c.fillRect(i, j, res, res);
+                } else if (p > 0.58) {
+                    c.fillStyle = "white"
                     c.fillRect(i, j, res, res);
                 } else {
-                    c.fillStyle = "teal"
+                // if (p > 0.45 && p < 0.55) {
+                //     c.fillStyle = "white"
+                //     c.globalAlpha = 1-p;
+                //     c.fillRect(i, j, res, res);
+                // } else {
+                    if (p > 0.47 && p < 0.5)
+                        c.fillStyle = "white"
+                    else c.fillStyle = "teal"
                     c.globalAlpha = (p * 0.4) + 0.5;
                     c.fillRect(i, j, res, res);
                 }
+
+                // c.fillStyle = "white";
+                // c.globalAlpha = Math.max(p2-0.2, 0);
+                // c.fillRect(i, j, res, res)
+                
             }
         }
 
