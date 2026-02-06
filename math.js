@@ -57,7 +57,15 @@ class Rand {
         return lerp(lerp(dotBottomLeft, dotTopLeft, v), lerp(dotBottomRight, dotTopRight, v), u)
     }
 
-    static perlin3D(x, y, z, P = defaultPermutation) {
+    static perlin3D(x, y, z, parameters = {}) {
+        let octaves = parameters.octaves ?? 1;
+        let lacunarity = parameters.lacunarity ?? 2;
+        let persistence = parameters.persistence ?? 0.5;
+        let permutation = parameters.permutation ?? defaultPermutation;
+        return this._perlin3D(0, x, y, z, octaves, octaves, permutation, lacunarity, persistence);
+    }
+
+    static _perlin3D(p, x, y, z, currentOctave, totalOctaves, P, lacunarity, persistence) {
         let X = Math.floor(x) & 255;
         let Y = Math.floor(y) & 255;
         let Z = Math.floor(z) & 255;
@@ -97,11 +105,15 @@ class Rand {
         let v = fade(yf);
         let w = fade(zf);
 
-        return lerp(
+        p += Math.pow(persistence, totalOctaves - currentOctave) * lerp(
             lerp(lerp(dotLowerBottomLeft, dotLowerTopLeft, v), lerp(dotLowerBottomRight, dotLowerTopRight, v), u),
             lerp(lerp(dotUpperBottomLeft, dotUpperTopLeft, v), lerp(dotUpperBottomRight, dotUpperTopRight, v), u),
             w
         );
+
+        if (currentOctave > 1)
+            return this._perlin3D(p, lacunarity*x, lacunarity*y, z, currentOctave - 1, totalOctaves, P, lacunarity, persistence);
+        else return p;
     }
 
     static octave(paramsInput, paramsOther, noiseFunction, n, persistence = 0.5, lacunarity = 2) {

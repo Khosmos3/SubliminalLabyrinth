@@ -108,64 +108,24 @@ function play() {
             Labyrinth.move("west");
         }
 
-        let res = 8;
+        let res = 7;
         let p = 0;
         let p2;
 
         for (let i = 0; i < WIDTH; i+=res) {
             for (let j = 0; j < HEIGHT; j+=res) {
-                p = 0;
+                let frequency = 0.003;
 
-                let freq = 0.002;
-                // let amplitude = 1;
-                // let frequency = 0.003;
-                // let persistence = 0.5;
-                // let lacunarity = 2;
-                // for (let w = 0; w < 3; w++) {
-                //     p += amplitude*Rand.perlin3D(i*frequency, j*frequency, (t+day)*10000*frequency, permutation);
-                //     amplitude *= persistence;
-                //     frequency *= lacunarity;
-                // }
-
-                p = Rand.octave([i*freq, j*freq, (t+day)*10], [permutation], Rand.perlin3D, 4);
+                p = Rand.perlin3D(i*frequency, j*frequency, (t+day)*50, {octaves: 5, permutation: permutation});
 
                 p = clamp((p + 1) / 2, 0, 1);
 
-                if (p > 0.995) {
-                    c.fillStyle = "white"
-                    c.globalAlpha = p;
-                    c.fillRect(i, j, res, res);
-                } else if (p > 0.8) {
-                    c.fillStyle = "#737272ff"
-                    c.globalAlpha = (1-p)+0.7;
-                    c.fillRect(i, j, res, res);
-                } else if (p > 0.65) {
-                    c.fillStyle = "green"
-                    c.globalAlpha = p;
-                    c.fillRect(i, j, res, res);
-                } else if (p > 0.6) {
-                    c.globalAlpha = 1;
-                    c.fillStyle = "#ffe8b3ff";
-                    c.fillRect(i, j, res, res);
-                } else if (p > 0.58) {
-                    c.fillStyle = "white"
-                    c.fillRect(i, j, res, res);
-                } else {
-                // if (p > 0.45 && p < 0.55) {
-                //     c.fillStyle = "white"
-                //     c.globalAlpha = 1-p;
-                //     c.fillRect(i, j, res, res);
-                // } else {
-                    if (p > 0.47 && p < 0.5)
-                        c.fillStyle = "white"
-                    else c.fillStyle = "teal"
-                    c.globalAlpha = (p * 0.4) + 0.5;
-                    c.fillRect(i, j, res, res);
-                }
-
-                // c.fillStyle = "white";
-                // c.globalAlpha = Math.max(p2-0.2, 0);
-                // c.fillRect(i, j, res, res)
+                if (p > 0.5)
+                    c.fillStyle = "green";
+                else c.fillStyle = "teal";
+                c.globalAlpha = p;
+                
+                c.fillRect(i, j, res, res);
                 
             }
         }
