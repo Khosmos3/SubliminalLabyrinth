@@ -281,6 +281,13 @@ class Vector {
         else return new Vector(1, -1)
     }
 
+    rotate(angle) {
+        let oldX = this.x;
+        let oldY = this.y ;
+        this.x = oldX*Math.cos(angle) - oldY*Math.sin(angle)
+        this.y = oldX*Math.sin(angle) + oldY*Math.cos(angle)
+    }
+
     copy(v = new Vector()) {
         v.x = this.x;
         v.y = this.y;

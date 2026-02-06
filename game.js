@@ -53,9 +53,49 @@ get("cred").addEventListener("animationend", () => {
     get("cred").classList.remove("initButtonAnimate");
 })
 
-play();
+//play();
+
+const RES = 6;
+let cvs = get("canvas");
+cvs.width = WIDTH;
+cvs.height = HEIGHT;
+let c = cvs.getContext("2d");
+let T = 0;
+
+let titleScreenInterval = setInterval(() => {
+    let p = 0;
+    for (let i = 0; i < WIDTH; i+=RES) {
+        for (let j = 0; j < HEIGHT; j+=RES) {
+            let frequency = 0.05;
+
+            let v = new Vector(i - WIDTH/2, j - HEIGHT/2);
+            v.rotate(Math.sin(T/2000 + 0.8) * Math.cbrt(v.mag));
+
+            if (T < 24) p = Rand.perlin3D((v.x/T + WIDTH/2)*frequency, (v.y/T + HEIGHT/2)*frequency*5, T*0.01, {octaves: 4});
+            else p = Rand.perlin3D((v.x/24 + WIDTH/2)*frequency, (v.y/24 + HEIGHT/2)*frequency*5, T*0.01, {octaves: 4});
+            p = clamp((p + 1) / 2, 0, 1);
+
+            if (p > 0.9)
+                c.fillStyle = "#9fc4a7ff"
+            else if (p > 0.7)
+                c.fillStyle = "#7da386ff"
+            else if (p > 0.5)
+                c.fillStyle = "#72987b"
+            else if (p > 0.3)
+                c.fillStyle = "#6e9176ff"
+            else
+                c.fillStyle = "#6a8d72ff"
+            c.globalAlpha = 1;
+            
+            c.fillRect(i, j, RES, RES);
+            
+        }
+    }
+    T+=1;
+}, 32);
 
 function play() {
+    clearInterval(titleScreenInterval);
     let disp = get("display");
     disp.addEventListener("animationstart", () => {
         disp.style.pointerEvents = "none";
@@ -67,18 +107,9 @@ function play() {
 
     white.style.display = "none";
     get("start-menu").style.display = "none";
-    //get("container").style.display = "flex";        
-    let cvs = get("canvas");
-    cvs.width = WIDTH;
-    cvs.height = HEIGHT;
-    let c = cvs.getContext("2d");
-    c.fillStyle = "green";
-
-
+    get("container").style.display = "flex";        
+    
     Labyrinth.updateLog({ first: true });
-
-    let permutation = makePermutation();
-    let permutation2 = makePermutation();
 
     setInterval(() => {
         c.clearRect(0, 0, WIDTH, HEIGHT);
@@ -108,24 +139,24 @@ function play() {
             Labyrinth.move("west");
         }
 
-        let res = 7;
         let p = 0;
-        let p2;
-
-        for (let i = 0; i < WIDTH; i+=res) {
-            for (let j = 0; j < HEIGHT; j+=res) {
+        for (let i = 0; i < WIDTH; i+=RES) {
+            for (let j = 0; j < HEIGHT; j+=RES) {
                 let frequency = 0.003;
 
-                p = Rand.perlin3D(i*frequency, j*frequency, (t+day)*50, {octaves: 5, permutation: permutation});
+                p = Rand.perlin3D(i*frequency, j*frequency, (t+day)*50, {octaves: 5});
 
                 p = clamp((p + 1) / 2, 0, 1);
 
-                if (p > 0.5)
-                    c.fillStyle = "green";
-                else c.fillStyle = "teal";
-                c.globalAlpha = p;
+                if (p > 0.7)
+                    c.fillStyle = backgroundColor.shaded(10).getHex();
+                else if (p > 0.3)
+                    c.fillStyle = backgroundColor.getHex();
+                else
+                    c.fillStyle = backgroundColor.shaded(-10).getHex();
+                c.globalAlpha = 1;
                 
-                c.fillRect(i, j, res, res);
+                c.fillRect(i, j, RES, RES);
                 
             }
         }
@@ -159,9 +190,6 @@ function play() {
         if (currentEffect && !currentEffect.complete) {
             backgroundColor = currentEffect.update(t);
         }
-        // console.log(backgroundColor)
-
-        // console.log(t)
 
         // get("background").style.background = backgroundColor.getHex();
         get("container").style.color = backgroundColor.inverse().asGreyscale().shaded(-70).getHex();

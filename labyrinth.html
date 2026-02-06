@@ -98,8 +98,7 @@
         }
 
         #background {
-            border: 0.7vw solid #064a18;
-            /* background: #72987b; */
+            border: 0.7vw solid rgb(69, 94, 75);
             width: 100vw;
             height: 100vh;
         }
@@ -166,44 +165,42 @@
         }
 
         #canvas {
-            border: 1px solid red;
             position: fixed;
+            z-index: -1;
         }
     </style> 
 </head>
 
 <body>
     <div id="white"></div>
-    <canvas id="canvas">
-
-    </canvas>
-        <div id="background">
-            <div id="credits">
-                Programmed and imagined by Tom Steen<br>
-                Inspired from the prompt "A labyrinth"<br>
-                2025-2026
-                <div id="toMain" class="menuButton" onclick="
-                    get('start-menu').classList.add('menuFade');
-                    get('start-menu').style.display = 'block';
-                    get('credits').style.display = 'none';
-                    setTimeout(`get('credits').classList.add('start-menu');`, 1200)">Return</div>
-            </div>
-            <div id="start-menu">
-                <div id="title" class="titleAnimate">The Labyrinth</div>
-                <div id="start" class="menuButton initialButton" onclick="
-                    get('white').style.display = 'block';
-                    get('white').classList.add('fadeWhite')">Enter the Labyrinth</div>
-                <div id="cred" class="menuButton initialButton" onclick="
-                    get('credits').classList.add('menuFade');
-                    get('start-menu').style.display = 'none';
-                    get('credits').style.display = 'block';
-                    setTimeout(`get('credits').classList.add('menuFade');`, 1200)">Credits</div>
-            </div>
-            <div id="container">
-                <div id="map"></div>
-                <div id="display"></div>
-            </div>
+    <canvas id="canvas"></canvas>
+    <div id="background">
+        <div id="credits">
+            Programmed and imagined by Tom Steen<br>
+            Inspired from the prompt "A labyrinth"<br>
+            2025-2026
+            <div id="toMain" class="menuButton" onclick="
+                get('start-menu').classList.add('menuFade');
+                get('start-menu').style.display = 'block';
+                get('credits').style.display = 'none';
+                setTimeout(`get('credits').classList.add('start-menu');`, 1200)">Return</div>
         </div>
+        <div id="start-menu">
+            <div id="title" class="titleAnimate">The Labyrinth</div>
+            <div id="start" class="menuButton initialButton" onclick="
+                get('white').style.display = 'block';
+                get('white').classList.add('fadeWhite')">Enter the Labyrinth</div>
+            <div id="cred" class="menuButton initialButton" onclick="
+                get('credits').classList.add('menuFade');
+                get('start-menu').style.display = 'none';
+                get('credits').style.display = 'block';
+                setTimeout(`get('credits').classList.add('menuFade');`, 1200)">Credits</div>
+        </div>
+        <div id="container">
+            <div id="map"></div>
+            <div id="display"></div>
+        </div>
+    </div>
 </body>
 <script src="math.js"></script>
 <script src="color.js"></script>
