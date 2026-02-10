@@ -387,6 +387,10 @@ function shuffle(arr) {
     }
 }
 
+function remap(n, pMin, pMax, min, max) {
+    return ((n - pMin)/(pMax - pMin))*(max - min) + min;
+}
+
 function makePermutation() {
     let P = [];
     for (let i = 0; i < 256; i++) {

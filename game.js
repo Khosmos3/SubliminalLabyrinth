@@ -63,31 +63,38 @@ let c = cvs.getContext("2d");
 let T = 0;
 
 let titleScreenInterval = setInterval(() => {
+    c.clearRect(0, 0, WIDTH, HEIGHT);
+
     let p = 0;
     for (let i = 0; i < WIDTH; i+=RES) {
         for (let j = 0; j < HEIGHT; j+=RES) {
-            let frequency = 0.05;
+            let frequency = 0.03;
 
             let v = new Vector(i - WIDTH/2, j - HEIGHT/2);
-            v.rotate(Math.sin(T/2000 + 0.8) * Math.cbrt(v.mag));
+            v.rotate(Math.sin(T/2500 + 0.8) * Math.pow(v.mag, 0.3));
 
-            if (T < 24) p = Rand.perlin3D((v.x/T + WIDTH/2)*frequency, (v.y/T + HEIGHT/2)*frequency*5, T*0.01, {octaves: 4});
-            else p = Rand.perlin3D((v.x/24 + WIDTH/2)*frequency, (v.y/24 + HEIGHT/2)*frequency*5, T*0.01, {octaves: 4});
-            p = clamp((p + 1) / 2, 0, 1);
+            if (T < 100) p = Rand.perlin3D((v.x/Math.sqrt(T) + WIDTH/2)*frequency, (v.y/Math.sqrt(T) + HEIGHT/2)*frequency*4, T*0.015, {octaves: 4});
+            else p = Rand.perlin3D((v.x/10 + WIDTH/2)*frequency, (v.y/10 + HEIGHT/2)*frequency*4, T*0.015, {octaves: 4});
+            
+            p = clamp(remap(p, -1.3, 1.3, 0, 1), 0, 1);
 
-            if (p > 0.9)
+            if (p > 0.98)
+                c.fillStyle = "#cbdaceff"
+            else if (p > 0.8)
                 c.fillStyle = "#9fc4a7ff"
-            else if (p > 0.7)
+            else if (p > 0.65)
                 c.fillStyle = "#7da386ff"
+            // else if (p > 0.6)
+            //     c.fillStyle = "#78a182ff"
             else if (p > 0.5)
-                c.fillStyle = "#72987b"
+                c.fillStyle = "#72987bff"
             else if (p > 0.3)
                 c.fillStyle = "#6e9176ff"
             else
                 c.fillStyle = "#6a8d72ff"
-            c.globalAlpha = 1;
             
-            c.fillRect(i, j, RES, RES);
+            
+            c.fillRect(i, j , RES, RES);
             
         }
     }
