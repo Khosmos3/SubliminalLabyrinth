@@ -317,13 +317,13 @@ class Maze {
             this.reminders.hands = true;
             log += "You look down at your hands, then lift them directly before your eyes. You clench your fists, then splay your fingers as wide as they will go. " +
                 "You fold each finger individually, watching how the shadows they cast dance and change. You look closer at the dark lines, crevasses, etches in your skin. " +
-                "You realize such small, beautiful details are rare here. How wonderful it is to occupy a body.";
+                "You realize such small, beautiful details are rare here in this labyrinth. How wonderful it is to occupy a body.";
             this.self.understanding++;
         } else if (text === "something else") {
             log += "You remember you are alive in the world. You remember that life is allowed to have meaning. You are reminded of meaning and of laughing and of having nothing to do. You almost remember somebody.";
             this.self.understanding++;
         } else if (text === "them") {
-            log += "You don't know how you know, but they would never hurt you. They would let you be anything.";
+            log += "You don't know how you know, you don't know who they are, but they would never hurt you. They would let you be anything.";
             this.self.understanding++;
         } else if (text === "Pick a flower?") {
             log += "You pick a flower! The stem connecting it to the hedge gently breaks. " + (this.self.wearingFlower ? "" : this.clickable("Put the flower in your hair?"));
@@ -636,7 +636,7 @@ class Maze {
                         "An urn sits on a small pedestal. It reflects little light.",
                     ]);
 
-                if (this.self.items.includes("flower") && !this.currentRoom.includes("flower"))
+                if (this.self.items.includes("flower") && !this.currentRoom.items.includes("flower"))
                     log += "<br>" + this.clickable("Put a flower atop the urn?") + " ";
                 break;
             case "dead": log += Rand.choice([
@@ -701,12 +701,16 @@ class Maze {
                 "You can only go back the way you came.",
                 "It seems you've reached a dead end.",
                 "There's nowhere else to go but back.",
+                "There is nothing beyond here.",
+                "This place marks the end of this path."
             ]);
                 break;
             case 2: log += Rand.choice([
                 "The path continues before you.",
                 "You may go back the way you came, or continue forwards.",
                 "A single route lies ahead.",
+                "The hedges mark a continuing route.",
+                "The leafy corridor continues."
             ]);
                 break;
             case 3: log += Rand.choice([
@@ -714,6 +718,7 @@ class Maze {
                 "You are presented with various options.",
                 "There are many paths available to you.",
                 "The path branches.",
+                "You've come to a crossroads.",
             ]);
                 break;
             case 4: log += Rand.choice([
@@ -721,6 +726,7 @@ class Maze {
                 "This room is connected to all of its neighbors.",
                 "You may reach many places from here.",
                 "Here, many paths converge.",
+                "You've come to a crossroads."
             ]);
                 break;
         }
