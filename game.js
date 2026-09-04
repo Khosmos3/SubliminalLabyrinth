@@ -68,13 +68,18 @@ let titleScreenInterval = setInterval(() => {
     let p = 0;
     for (let i = 0; i < WIDTH; i+=RES) {
         for (let j = 0; j < HEIGHT; j+=RES) {
-            let frequency = 0.03;
+            const zoomStop = 250;
+            const zoomPower = 0.25;
+            const speed = 0.005;
+            const desiredFinalFreq = 0.003;
+            const yStretch = 4;
+            let frequency = desiredFinalFreq*Math.pow(zoomStop, zoomPower);
 
             let v = new Vector(i - WIDTH/2, j - HEIGHT/2);
             v.rotate(Math.sin(T/2500 + 0.8) * Math.pow(v.mag, 0.3));
 
-            if (T < 100) p = Rand.perlin3D((v.x/Math.sqrt(T) + WIDTH/2)*frequency, (v.y/Math.sqrt(T) + HEIGHT/2)*frequency*4, T*0.015, {octaves: 4});
-            else p = Rand.perlin3D((v.x/10 + WIDTH/2)*frequency, (v.y/10 + HEIGHT/2)*frequency*4, T*0.015, {octaves: 4});
+            if (T < zoomStop) p = Rand.perlin3D((v.x/(Math.pow(T+4, zoomPower)) + WIDTH/2)*frequency, (v.y/(Math.pow(T+4, zoomPower)) + HEIGHT/2)*frequency*yStretch, T*speed, {octaves: 4});
+            else p = Rand.perlin3D((v.x/Math.pow(zoomStop, zoomPower) + WIDTH/2)*frequency, (v.y/Math.pow(zoomStop, zoomPower) + HEIGHT/2)*frequency*yStretch, T*speed, {octaves: 4});
             
             p = clamp(remap(p, -1.3, 1.3, 0, 1), 0, 1);
 
