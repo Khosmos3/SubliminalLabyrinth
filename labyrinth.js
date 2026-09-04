@@ -243,7 +243,7 @@ class Maze {
         this.currentRoom.discovered = true;
         this.currentRoom.timesVisited++;
 
-        set(this.map(), "map")
+        set(this.map(), "map");
         this.updateLog();
     }
 
@@ -375,6 +375,9 @@ class Maze {
             this.reminders.impermanence = true;
             log += "How can something go into nothing? Likewise, how can something arise from nothing? Truly, in interconnectedness, there are no things which can disappear, but therefore there are no things which can be created. Something and nothing are <i>not-two</i>. The world appears to be here, created from nothing, when it is simply nothingness/somethingness returned onto itself. All other appearances are likewise empty.";
             this.self.understanding++;
+        } else if (text === "map") {
+            set(this.map(), "map");
+            log += this.updateLog({stay: true})
         } else if (text === "Sip") {
             log += Rand.choice([
                 "You drink from the fountain, wetting your dry lips.",
@@ -734,10 +737,11 @@ class Maze {
 
         if (this.self.items.length !== 0)
             this.self.hadSomething = true;
-        if (this.self.hadSomething)
+        if (true)
             log += "<br>Observe your " + this.clickable("belongings", "Labyrinth.seeItems()") + "?";
 
         set(log);
+        return log;
     }
 
     seeItems() {
@@ -759,7 +763,26 @@ class Maze {
         if (!this.self.items.includes("flower") && this.self.wearingFlower)
             log += "You have a white flower tucked gently behind your ear. " + this.clickable("Take it off?") + "<br>";
 
-        set(log + "<br>" + this.generateDirections(true));
+        log += "<br>Return to " + this.clickable("map") + "?";
+        
+        set(log)
+
+        let invWidth = 28;
+        let invHeight = 19;
+        let horizontalSpacing = (invWidth - 1) / 3;
+        let verticalSpacing = (invHeight - 1) / 3;
+
+        let s = "";
+        for (let j = 0; j < invHeight; j++) {
+            for (let i = 0; i < invWidth; i++)
+                if (i%horizontalSpacing===0 && j%verticalSpacing===0) s += this.border[0];
+                else if (i%horizontalSpacing===0) s += this.border[3] + (i === invWidth - 1 ? "" : "▓");
+                else if (j%verticalSpacing===0) s += this.border[1];
+                else s += "▓";
+            s += "\n";
+        }
+
+        set(s, "map");
     }
 }
 

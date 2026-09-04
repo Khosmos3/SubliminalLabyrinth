@@ -53,8 +53,6 @@ get("cred").addEventListener("animationend", () => {
     get("cred").classList.remove("initButtonAnimate");
 })
 
-//play();
-
 const RES = 6;
 let cvs = get("canvas");
 cvs.width = WIDTH;
@@ -106,6 +104,8 @@ let titleScreenInterval = setInterval(() => {
     T+=1;
 }, 32);
 
+play()
+
 function play() {
     clearInterval(titleScreenInterval);
     let disp = get("display");
@@ -125,7 +125,6 @@ function play() {
 
     setInterval(() => {
         c.clearRect(0, 0, WIDTH, HEIGHT);
-
 
         for (const entry in Controls) {
             let active = false;
