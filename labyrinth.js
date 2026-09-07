@@ -33,6 +33,10 @@ const ROOMS_OTHER = {
     coin: new Tile("coin", ["▛ ▜", " ▃ ", "▙ ▟"], {func: (currentRoom) => {currentRoom.items.push("coin")}}),
 }
 
+const ITEMS = {
+    flower: ["flower"],
+    shears: [],
+}
 
 class Maze {
     constructor(width, height) {
@@ -778,7 +782,7 @@ class Maze {
                 if (i%horizontalSpacing===0 && j%verticalSpacing===0) s += this.border[0];
                 else if (i%horizontalSpacing===0) s += this.border[3] + (i === invWidth - 1 ? "" : "▓");
                 else if (j%verticalSpacing===0) s += this.border[1];
-                else s += "▓";
+                else s += ITEMS.flower[0][0];
             s += "\n";
         }
 
