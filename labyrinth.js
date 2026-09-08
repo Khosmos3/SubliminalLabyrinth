@@ -34,8 +34,8 @@ const ROOMS_OTHER = {
 }
 
 const ITEMS = {
-    flower: ["flower"],
-    shears: [],
+    flower: ["flower1", "flower2", "flower3", "flower4", "flower5"],
+    shears: ["shears1", "shears2", "shears3", "shears4", "shears5"],
 }
 
 class Maze {
@@ -63,7 +63,7 @@ class Maze {
         this.reminders = {};
         this.self = {
             understanding: 0,
-            items: [],
+            items: ["flower", "shears"],
             wearingFlower: false,
         }
 
@@ -777,13 +777,22 @@ class Maze {
         let verticalSpacing = (invHeight - 1) / 3;
 
         let s = "";
+        let slot = 0;
+        let itemInSlot = false;
         for (let j = 0; j < invHeight; j++) {
-            for (let i = 0; i < invWidth; i++)
+            for (let i = 0; i < invWidth; i++) {
+                slot = 3 * Math.floor(j / verticalSpacing) + Math.floor(i / horizontalSpacing);
+                itemInSlot = this.self.items[slot];
+
                 if (i%horizontalSpacing===0 && j%verticalSpacing===0) s += this.border[0];
-                else if (i%horizontalSpacing===0) s += this.border[3] + (i === invWidth - 1 ? "" : "▓");
+                else if (i%horizontalSpacing===0) s += this.border[3] + (i === invWidth - 1 ? "" : (itemInSlot ? " " : "▓"));
                 else if (j%verticalSpacing===0) s += this.border[1];
-                else s += ITEMS.flower[0][0];
-            s += "\n";
+                else if (itemInSlot) {
+                    s += ITEMS[itemInSlot][j%verticalSpacing-1] + " ";
+                    i += horizontalSpacing-2;
+                } else s += "▓";
+            }
+            s += "<br>";
         }
 
         set(s, "map");
