@@ -32,10 +32,18 @@ const ROOMS_OTHER = {
     empty: new Tile("empty", ["▓▓▓", "▓▓▓", "▓▓▓"]),
     coin: new Tile("coin", ["▛ ▜", " ▃ ", "▙ ▟"], {func: (currentRoom) => {currentRoom.items.push("coin")}}),
 }
-
+//⎞⎛⎠⎝⧹⧸
 const ITEMS = {
-    flower: ["flower1", "flower2", "flower3", "flower4", "flower5"],
-    shears: ["shears1", "shears2", "shears3", "shears4", "shears5"],
+    flower: [" ⎛⧹⋎⧸⎞ ", 
+             " ⎨>o<⎬ ",
+             "╭⎝⧸⋏⧹⎠ ",
+             "┥ ╭┰╮  ",
+             "╰┸╯ ┝  "],
+    shears: ["   ⋏   ", 
+             "  ⎹⧸⎸  ",
+             "  .X.  ",
+             "  ⎛⌣⎞  ",
+             "  ⎢ ⎥  "],
 }
 
 class Maze {
@@ -63,7 +71,7 @@ class Maze {
         this.reminders = {};
         this.self = {
             understanding: 0,
-            items: ["flower", "shears"],
+            items: [],
             wearingFlower: false,
         }
 
