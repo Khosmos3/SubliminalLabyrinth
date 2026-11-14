@@ -13,10 +13,10 @@ document.addEventListener("keyup", (e) => pressedKeys.delete(e.key));
 const keyPressed = key => pressedKeys.has(key);
 const handleInput = (input, offset) => input == 1 || input % offset == 1;
 const Controls = {
-    moveNorth: { input: ["w", "ArrowUp"], active: 0 },
-    moveSouth: { input: ["s", "ArrowDown"], active: 0 },
-    moveWest: { input: ["a", "ArrowLeft"], active: 0 },
-    moveEast: { input: ["d", "ArrowRight"], active: 0 },
+    moveNorth: { input: [/* "w",  "ArrowUp" */], active: 0 },
+    moveSouth: { input: [/* "s", /* "ArrowDown" */], active: 0 },
+    moveWest: { input: [/* "a", /* "ArrowLeft" */], active: 0 },
+    moveEast: { input: [/* "d", /* "ArrowRight" */], active: 0 },
     interact: { input: ["e"], active: 0 },
     screenshot: { input: ["c"], active: 0 },
 }
@@ -103,8 +103,6 @@ let titleScreenInterval = setInterval(() => {
     }
     T+=1;
 }, 32);
-
-play()
 
 function play() {
     clearInterval(titleScreenInterval);
