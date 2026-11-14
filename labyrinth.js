@@ -19,11 +19,11 @@ const ROOMS_ADDABLE = {
     unkempt: new Tile("unkempt", ["▒X▒", "\\/.", "▒=▒"], {addableRooms:  1}),
     arch: new Tile("arch", ["█∩█", "∩ ∩", "█∩█"], {addableRooms:  1, connectsNearby: true}),
     urn: new Tile("urn", [", .", " ⬮ ", " \","], {addableRooms:  0.5}),
-    tree: new Tile("tree", [",  ", ".𐤅.", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.items.push("shears")}}),
+    tree: new Tile("tree", [",  ", ".‭𐤅.", "\"' "], {addableRooms:  2, func: (currentRoom) => {currentRoom.items.push("shears")}}),
     loop: new Tile("loop", ["., ", "  .", "= ."], {connectsNearby: true}),
     dead: new Tile("dead", ["▒░▒", "░ ░", "▒░▒"]),
     overgrown: new Tile("overgrown", ["▒▒▒", "▒░▒", "▒▒▒"], {addableRooms:  1, connectAdded: false}),
-    well: new Tile("well", ["aaa", "aaa", "aaa"], {addableRooms: 1}),
+    //well: new Tile("well", ["aaa", "aaa", "aaa"], {addableRooms: 1}),
     //dire: new Tile("dire", ["wow", "omg", "lol"], {connectsNearby: true, addableRooms: 1.25, func: (c) => {console.log("Wolf is here!")}})
 }
 
@@ -147,6 +147,12 @@ class Maze {
         this.currentRoom.discovered = true;
         this.currentRoom.timesVisited = 1;
 
+        this.stageOneDistribution = [];
+        this.stageTwoDistribution = [];
+
+        // rooms 
+
+
         this.advance(x, y);
 
         set(this.map(), "map")
@@ -161,7 +167,7 @@ class Maze {
                     this.addRoom(x, y, 1, tile.connectAdded);
             else this.addRoom(x, y, tile.addableRooms, tile.connectAdded)
         }
-
+        // bag idea
         if (tile.name === "overgrown") {
             this.addRoom(x, y, 1, false, ROOMS_OTHER.coin);
         }
@@ -179,7 +185,6 @@ class Maze {
         currentRoom.new = false;
 
         this.getNeighbors(x, y).forEach(room => room.new ? this.advance(room.x, room.y) : "");
-
     }
 
     addRoom(x, y, numRooms = 1, connect = true, room = false) {
@@ -316,7 +321,7 @@ class Maze {
             this.self.understanding++;
         } else if (text === "breathing") {
             this.reminders.breathing = true;
-            log += "You remember to breathe. Your shoulders slack and your stomach loosens. You relax. You breathe in. You breathe out. You realize nothing is happening." +
+            log += "You remember to breathe. Your shoulders slack and your stomach loosens. You relax. You breathe in. You breathe out. You realize nothing is happening. " +
                 "No air flows in, no air flows out. Goosebumps manifest across your flesh. You tighten. In this system of the observer and the environment, which is not real?";
             this.self.understanding++;
         } else if (text === "love") {
@@ -412,18 +417,18 @@ class Maze {
                     [backgroundColor.getHex(), 50],
                     ["#eeeeee", 10], ["#dddddd", 10],
                     ["#eeeeee", 10], ["#ffffff", 10],
-                    ["#eeeeee", 10], ["#dddddd", 10],
-                    ["#eeeeee", 10], ["#cccccc", 10],
-                    ["#eeeeee", 10], ["#dddddd", 10],
-                    ["#eeeeee", 10], ["#dddddd", 10],
-                    ["#eeeeee", 10], ["#dddddd", 10],
+                    ["#999999", 10], ["#dddddd", 10],
+                    ["#bbbbbb", 10], ["#cccccc", 10],
+                    ["#eeeeee", 10], ["#aaaaaa", 10],
+                    ["#eeeeee", 10], ["#999999", 10],
+                    ["#aaaaaa", 10], ["#dddddd", 10],
                     ["#eeeeee", 10], ["#ffffff", 10],
-                    ["#eeeeee", 10], ["#dddddd", 10],
+                    ["#bbbbbb", 10], ["#dddddd", 10],
                     ["#eeeeee", 10], ["#cccccc", 10],
-                    ["#eeeeee", 10], ["#dddddd", 10],
-                    ["#eeeeee", 20], ["#dddddd", 20],
-                    ["#eeeeee", 30], ["#dddddd", 30],
-                    ["#eeeeee", 40], ["#dddddd", 40],
+                    ["#999999", 10], ["#dddddd", 10],
+                    ["#eeeeee", 20], ["#aaaaaa", 20],
+                    ["#eeeeee", 30], ["#bbbbbb", 30],
+                    ["#aaaaaa", 40], ["#dddddd", 40],
                     ["#eeeeee", 200],
                 ], x), 300)
                 t = 0.7;
