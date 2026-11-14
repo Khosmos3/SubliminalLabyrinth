@@ -104,8 +104,6 @@ let titleScreenInterval = setInterval(() => {
     T+=1;
 }, 32);
 
-play()
-
 function play() {
     clearInterval(titleScreenInterval);
     let disp = get("display");
